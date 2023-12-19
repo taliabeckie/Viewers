@@ -69,6 +69,11 @@ module.exports = (env, argv) => {
         // Hoisted Yarn Workspace Modules
         path.resolve(__dirname, '../../../node_modules'),
         SRC_DIR,
+        path.resolve(__dirname, '/Users/taliabeckie/Desktop/Viewers/ucalgary-mode/node_modules'),
+        path.resolve(
+          __dirname,
+          '/Users/taliabeckie/Desktop/Viewers/ucalgary-extension/node_modules'
+        ),
       ],
     },
     plugins: [
