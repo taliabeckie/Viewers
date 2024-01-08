@@ -1,6 +1,7 @@
 import { hotkeys } from '@ohif/core';
 import { id } from './id';
-import { initToolGroups, toolbarButtons } from '@ohif/mode-longitudinal';
+import toolbarButtons from './toolbarButtons';
+import initToolGroups from './initToolGroups';
 
 const ohif = {
   layout: '@ohif/extension-default.layoutTemplateModule.viewerLayout',
@@ -13,6 +14,12 @@ const ohif = {
 const cornerstone = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
 };
+const segmentation = {
+  panel: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentation',
+  panelTool: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentationWithTools',
+  sopClassHandler: '@ohif/extension-cornerstone-dicom-seg.sopClassHandlerModule.dicom-seg',
+  viewport: '@ohif/extension-cornerstone-dicom-seg.viewportModule.dicom-seg',
+};
 
 /**
  * Just two dependencies to be able to render a viewport with panels in order
@@ -21,6 +28,7 @@ const cornerstone = {
 const extensionDependencies = {
   '@ohif/extension-default': '^3.0.0',
   '@ohif/extension-cornerstone': '^3.0.0',
+  '@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -30,15 +38,16 @@ function modeFactory({ modeConfiguration }) {
      * is used to identify the mode in the viewer's state.
      */
     id,
-    routeName: 'template',
+    routeName: 'segmentation',
     /**
      * Mode name, which is displayed in the viewer's UI in the workList, for the
      * user to select the mode.
      */
-    displayName: 'Template Mode',
+    displayName: 'UCalgary',
+
     /**
      * Runs when the Mode Route is mounted to the DOM. Usually used to initialize
-     * Services and other resources.
+     * services and other resources or data. Is called whenever a new mode is entered.
      */
     onModeEnter: ({ servicesManager, extensionManager, commandsManager }) => {
       const { measurementService, toolbarService, toolGroupService } = servicesManager.services;
@@ -80,6 +89,7 @@ function modeFactory({ modeConfiguration }) {
       toolbarService.init(extensionManager);
       toolbarService.addButtons(toolbarButtons);
       toolbarService.createButtonSection('primary', [
+        'Fiducial',
         'MeasurementTools',
         'Zoom',
         'WindowLevel',
@@ -91,6 +101,10 @@ function modeFactory({ modeConfiguration }) {
         'MoreTools',
       ]);
     },
+    /**
+     * OnModeExit is called when navigating away from a mode.
+     * Can be used to cache data for reuse later.
+     */
     onModeExit: ({ servicesManager }) => {
       const {
         toolGroupService,
@@ -135,12 +149,16 @@ function modeFactory({ modeConfiguration }) {
             id: ohif.layout,
             props: {
               leftPanels: [ohif.leftPanel],
-              rightPanels: [ohif.rightPanel],
+              rightPanels: [segmentation.panelTool],
               viewports: [
                 {
                   namespace: cornerstone.viewport,
                   displaySetsToDisplay: [ohif.sopClassHandler],
                 },
+                // {
+                //   namespace: segmentation.viewport,
+                //   displaySetsToDisplay: [segmentation.sopClassHandler],
+                // },
               ],
             },
           };
