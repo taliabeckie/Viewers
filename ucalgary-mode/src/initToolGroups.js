@@ -2,7 +2,6 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
   const utilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone.utilityModule.tools'
   );
-    
 
   const { toolNames, Enums } = utilityModule.exports;
 
@@ -23,7 +22,6 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
       { toolName: toolNames.StackScrollMouseWheel, bindings: [] },
     ],
     passive: [
-
       { toolName: toolNames.Length },
       {
         toolName: toolNames.ArrowAnnotate,
