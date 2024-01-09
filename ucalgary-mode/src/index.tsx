@@ -22,7 +22,6 @@ const ucalgary = {
 const extensionDependencies = {
   '@ohif/extension-default': '^3.0.0',
   '@ohif/extension-cornerstone': '^3.0.0',
-  //'@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
