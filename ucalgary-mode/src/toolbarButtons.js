@@ -6,6 +6,7 @@ import {
   WindowLevelMenuItem,
 } from '@ohif/ui';
 import { defaults } from '@ohif/core';
+import ToolbarCinePlayer from '../../ucalgary-extension/src/cine/ToolBarCinePlayer';
 
 const { windowLevelPresets } = defaults;
 /**
@@ -394,6 +395,15 @@ const toolbarButtons = [
           'Calibration Line'
         ),
       ],
+    },
+  },
+
+  {
+    id: 'Cine',
+    type: 'ohif.action',
+    component: ToolbarCinePlayer,
+    props: {
+      label: 'Cine',
     },
   },
 ];

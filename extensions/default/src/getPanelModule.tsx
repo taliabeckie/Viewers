@@ -34,7 +34,7 @@ function getPanelModule({ commandsManager, extensionManager, servicesManager }) 
       name: 'measure',
       iconName: 'tab-linear',
       iconLabel: 'Measure',
-      label: i18n.t('SidePanel:Measurements'),
+      label: i18n.t('SidePanel:Workspace'),
       secondaryLabel: i18n.t('SidePanel:Measurements'),
       component: wrappedMeasurementPanel,
     },

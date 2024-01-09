@@ -3,22 +3,16 @@ import { id } from './id';
 import toolbarButtons from './toolbarButtons';
 import initToolGroups from './initToolGroups';
 
-const ohif = {
+const cornerstone = {
+  viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
+};
+
+const ucalgary = {
   layout: '@ohif/extension-default.layoutTemplateModule.viewerLayout',
   sopClassHandler: '@ohif/extension-default.sopClassHandlerModule.stack',
   hangingProtocol: '@ohif/extension-default.hangingProtocolModule.default',
   leftPanel: '@ohif/extension-default.panelModule.seriesList',
   rightPanel: '@ohif/extension-default.panelModule.measure',
-};
-
-const cornerstone = {
-  viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
-};
-const segmentation = {
-  panel: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentation',
-  panelTool: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentationWithTools',
-  sopClassHandler: '@ohif/extension-cornerstone-dicom-seg.sopClassHandlerModule.dicom-seg',
-  viewport: '@ohif/extension-cornerstone-dicom-seg.viewportModule.dicom-seg',
 };
 
 /**
@@ -28,7 +22,7 @@ const segmentation = {
 const extensionDependencies = {
   '@ohif/extension-default': '^3.0.0',
   '@ohif/extension-cornerstone': '^3.0.0',
-  '@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
+  //'@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -38,7 +32,8 @@ function modeFactory({ modeConfiguration }) {
      * is used to identify the mode in the viewer's state.
      */
     id,
-    routeName: 'segmentation',
+    // routeName: 'viewer',
+    // routeName: 'ucalgary', //eventually switch to this
     /**
      * Mode name, which is displayed in the viewer's UI in the workList, for the
      * user to select the mode.
@@ -89,16 +84,15 @@ function modeFactory({ modeConfiguration }) {
       toolbarService.init(extensionManager);
       toolbarService.addButtons(toolbarButtons);
       toolbarService.createButtonSection('primary', [
+        'Freehand',
         'Fiducial',
         'MeasurementTools',
         'Zoom',
         'WindowLevel',
         'Pan',
-        'Capture',
         'Layout',
-        'MPR',
-        'Crosshairs',
         'MoreTools',
+        //     'Cine',
       ]);
     },
     /**
@@ -143,22 +137,19 @@ function modeFactory({ modeConfiguration }) {
      */
     routes: [
       {
-        path: 'template',
+        path: 'template', //defines the route path to access the built applications for that route
         layoutTemplate: ({ location, servicesManager }) => {
+          //defines the layout for the specified route
           return {
-            id: ohif.layout,
+            id: ucalgary.layout,
             props: {
-              leftPanels: [ohif.leftPanel],
-              rightPanels: [segmentation.panelTool],
+              leftPanels: [ucalgary.leftPanel],
+              rightPanels: [ucalgary.rightPanel],
               viewports: [
                 {
                   namespace: cornerstone.viewport,
-                  displaySetsToDisplay: [ohif.sopClassHandler],
+                  displaySetsToDisplay: [ucalgary.sopClassHandler],
                 },
-                // {
-                //   namespace: segmentation.viewport,
-                //   displaySetsToDisplay: [segmentation.sopClassHandler],
-                // },
               ],
             },
           };
@@ -167,10 +158,16 @@ function modeFactory({ modeConfiguration }) {
     ],
     /** List of extensions that are used by the mode */
     extensions: extensionDependencies,
-    /** HangingProtocol used by the mode */
+    /** HangingProtocol used by the mode
+     * Specify an array of hanging protocols so the mode
+     * can rank them based on the displaySetSelector requirements.
+     */
     // hangingProtocol: [''],
-    /** SopClassHandlers used by the mode */
-    sopClassHandlers: [ohif.sopClassHandler],
+    /** SopClassHandlers used by the mode.
+     * Used to initialize 'DisplaySetService' with the provided SOPClass modules.
+     * Handles the creation of the displaySets.
+     */
+    sopClassHandlers: [ucalgary.sopClassHandler],
     /** hotkeys for mode */
     hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };

@@ -124,6 +124,7 @@ function modeFactory({ modeConfiguration }) {
       toolbarService.init(extensionManager);
       toolbarService.addButtons(toolbarButtons);
       toolbarService.createButtonSection('primary', [
+        'Freehand',
         'MeasurementTools',
         'Zoom',
         'WindowLevel',

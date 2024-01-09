@@ -140,6 +140,10 @@ import iconToolScissor from './../../assets/icons/icon-tool-scissor.svg';
 import iconToolShape from './../../assets/icons/icon-tool-shape.svg';
 import iconToolThreshold from './../../assets/icons/icon-tool-threshold.svg';
 
+/** UCalgary OHIF */
+import iconToolFiducial from './../../assets/icons/tool-fiducial.svg';
+import iconToolFreehand from './../../assets/icons/tool-freehand.svg';
+
 /** Old OHIF */
 import oldTrash from './../../assets/icons/old-trash.svg';
 import oldPlay from './../../assets/icons/old-play.svg';
@@ -285,6 +289,10 @@ const ICONS = {
   'icon-tool-scissor': iconToolScissor,
   'icon-tool-shape': iconToolShape,
   'icon-tool-threshold': iconToolThreshold,
+
+  /** UCalgary Tools */
+  'tool-fiducial': iconToolFiducial,
+  'tool-freehand': iconToolFreehand,
 
   /** Old OHIF */
   'old-trash': oldTrash,

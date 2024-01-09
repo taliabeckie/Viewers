@@ -30,6 +30,8 @@ import {
   SphereScissorsTool,
 } from '@cornerstonejs/tools';
 
+import FiducialTool from '../../../ucalgary-extension/src/tools/FiducialTool';
+
 import CalibrationLineTool from './tools/CalibrationLineTool';
 import ImageOverlayViewerTool from './tools/ImageOverlayViewerTool';
 
@@ -66,6 +68,7 @@ export default function initCornerstoneTools(configuration = {}) {
   addTool(RectangleScissorsTool);
   addTool(SphereScissorsTool);
   addTool(ImageOverlayViewerTool);
+  addTool(FiducialTool);
 
   // Modify annotation tools to use dashed lines on SR
   const annotationStyle = {
@@ -111,6 +114,7 @@ const toolNames = {
   RectangleScissors: RectangleScissorsTool.toolName,
   SphereScissors: SphereScissorsTool.toolName,
   ImageOverlayViewer: ImageOverlayViewerTool.toolName,
+  FiducialTool: FiducialTool.toolName,
 };
 
 export { toolNames };
