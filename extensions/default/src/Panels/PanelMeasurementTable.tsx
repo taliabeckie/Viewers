@@ -5,6 +5,8 @@ import { utils, ServicesManager } from '@ohif/core';
 import { MeasurementTable, Dialog, Input, useViewportGrid, ButtonEnums } from '@ohif/ui';
 import ActionButtons from './ActionButtons';
 import debounce from 'lodash.debounce';
+// import ConfigPoint from 'config-point';
+import Label from '../../../../platform/ui/src/components/Label/Label';
 
 import createReportDialogPrompt, {
   CREATE_REPORT_DIALOG_RESPONSE,
@@ -205,6 +207,36 @@ export default function PanelMeasurementTable({
     }
   };
 
+  const onChangeVisibilityHandler = ({ uid }, valueTypes) => {
+    commandsManager.runCommand('toggleMeasurementsVisibility', {
+      uids: uid ? [uid] : undefined,
+      valueTypes,
+    });
+  };
+
+  const onMeasurementDeleteHandler = ({ uid }) => {
+    commandsManager.runCommand('deleteMeasurement', {
+      uid,
+      showConfirmationModal: true,
+    });
+  };
+
+  //PHASELABEL TB
+  const handleInputChange = e => {
+    // Ensure that the input only allows integers
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    setInputValue(value);
+  };
+  const handleInputChange2 = e => {
+    // Ensure that the input only allows integers
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    setInputValue2(value);
+  };
+
+  // const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);  //ADD LATER - NEEDS EXTERNAL ALGO
+  const [inputValue, setInputValue] = useState(''); //PHASELABELBUTTON TB
+  const [inputValue2, setInputValue2] = useState(''); //PHASELABELBUTTON TB
+
   return (
     <>
       <div
@@ -214,11 +246,61 @@ export default function PanelMeasurementTable({
         <MeasurementTable
           title={t('Labels')}
           servicesManager={servicesManager}
+          amount={displayMeasurements.length}
           data={displayMeasurements}
           onClick={jumpToImage}
           onEdit={onMeasurementItemEditHandler}
+          onChangeVisibility={onChangeVisibilityHandler}
+          onDelete={onMeasurementDeleteHandler}
         />
       </div>
+      <div className="bg-secondary-main flex justify-between px-2 py-1">
+        <span className="text-base font-bold uppercase tracking-widest text-white">
+          {'Define Phases'}
+        </span>
+      </div>
+
+      <div>
+        <Label
+          children="End-Diastole:"
+          color="hoverless"
+          size="small"
+          rounded="small"
+          variant="text"
+          fullWidth={false}
+        />
+        <input
+          type="text"
+          id="integerInput"
+          value={inputValue}
+          onChange={handleInputChange}
+          maxLength={2}
+          min={0}
+          autoFocus={true}
+          size={6}
+        />
+
+        <Label
+          children="End-Systole:"
+          color="hoverless"
+          disabled={true}
+          size="small"
+          rounded="small"
+          variant="text"
+          fullWidth={false}
+        />
+        <input
+          type="text"
+          id="integerInput"
+          value={inputValue2}
+          onChange={handleInputChange2}
+          maxLength={2}
+          min={0}
+          autoFocus={true}
+          size={6}
+        />
+      </div>
+
       <div className="flex justify-center p-4">
         <ActionButtons
           onExportClick={exportReport}
@@ -287,5 +369,47 @@ function _mapMeasurementToDisplay(measurement, index, types) {
     isActive: selected,
     finding,
     findingSites,
+  };
+}
+
+function _mapReportToDisplay(reports = [], reportsSortInfo = {}) {
+  const { results = {} } = ConfigPoint.getConfig('externalAlgorithm') || {};
+  const { colorify } = results;
+  const latestPredictions = reports[0] || {};
+  const { label: predictionLabel, measurements: predictionItems } = latestPredictions;
+
+  /**
+   * Returns the most valuable report. I.e the first item on predictionItems
+   * @param predictionItems
+   * @param sortInfo
+   * @returns
+   */
+  function mostValuableReport(predictionItems = [], sortInfo = {}) {
+    const mostlyItem = predictionItems[0];
+
+    if (!mostlyItem) {
+      return [];
+    }
+
+    return [
+      {
+        label: sortInfo.desc,
+        values: [mostlyItem.text || mostlyItem.label],
+        valuesClassName: 'text-yellow-400',
+      },
+      {
+        label: 'Probability',
+        values: [mostlyItem.score],
+        valuesClassName: 'text-yellow-400',
+      },
+      { label: 'Trained from', values: [...(mostlyItem.trainedFrom || [])] },
+    ];
+  }
+
+  return {
+    colorify,
+    title: predictionLabel,
+    items: predictionItems,
+    reportInfos: mostValuableReport(predictionItems, reportsSortInfo),
   };
 }

@@ -21,6 +21,7 @@ import toggleStackImageSync from './utils/stackSync/toggleStackImageSync';
 import { getFirstAnnotationSelected } from './utils/measurementServiceMappings/utils/selection';
 import getActiveViewportEnabledElement from './utils/getActiveViewportEnabledElement';
 import { CornerstoneServices } from './types';
+import labelPhasesDialogPrompt from '../../../ucalgary-extension/src/modals/labelPhasesDialogPrompt';
 
 function commandsModule({
   servicesManager,
@@ -671,6 +672,25 @@ function commandsModule({
         }
       });
     },
+
+    openLabelPhasesDialogPrompt: () => {
+      try {
+        labelPhasesDialogPrompt(uiDialogService).then((promptResult = {}) => {
+          const { value: SeriesDescription } = promptResult;
+          if (SeriesDescription) {
+            //save phase values somewhere!
+            console.log(SeriesDescription);
+          }
+          // if (phase1) {
+          //  commandsManager.runCommand('createReport', {
+          //     phase1,
+          //   });
+          //  }
+        });
+      } catch (e) {
+        console.warn('Something went wrong while getting phase number from dialog', e);
+      }
+    },
   };
 
   const definitions = {
@@ -828,6 +848,11 @@ function commandsModule({
     },
     attachProtocolViewportDataListener: {
       commandFn: actions.attachProtocolViewportDataListener,
+    },
+    openLabelPhasesDialogPrompt: {
+      commandFn: actions.openLabelPhasesDialogPrompt,
+      storeContexts: [],
+      options: {},
     },
   };
 
