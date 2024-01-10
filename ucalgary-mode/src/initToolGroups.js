@@ -52,6 +52,7 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
       { toolName: toolNames.Magnify },
       { toolName: toolNames.SegmentationDisplay },
       { toolName: toolNames.CalibrationLine },
+      { toolName: toolNames.Fiducial },
     ],
     // enabled
     enabled: [{ toolName: toolNames.ImageOverlayViewer }],
@@ -114,6 +115,7 @@ function initSRToolGroup(extensionManager, toolGroupService, commandsManager) {
       { toolName: SRToolNames.SRBidirectional },
       { toolName: SRToolNames.SREllipticalROI },
       { toolName: SRToolNames.SRCircleROI },
+      { toolName: toolNames.Fiducial },
     ],
     enabled: [
       {
@@ -180,6 +182,7 @@ function initMPRToolGroup(extensionManager, toolGroupService, commandsManager) {
       { toolName: toolNames.CobbAngle },
       { toolName: toolNames.PlanarFreehandROI },
       { toolName: toolNames.SegmentationDisplay },
+      { toolName: toolNames.Fiducial },
     ],
     disabled: [
       {

@@ -6,6 +6,7 @@ import { onCompletedCalibrationLine } from './tools/CalibrationLineTool';
 
 import measurementServiceMappingsFactory from './utils/measurementServiceMappings/measurementServiceMappingsFactory';
 import getSOPInstanceAttributes from './utils/measurementServiceMappings/utils/getSOPInstanceAttributes';
+import Fiducial from '../../../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
 
 const { removeAnnotation } = annotation.state;
 
@@ -30,6 +31,7 @@ const initMeasurementService = (
     CobbAngle,
     RectangleROI,
     PlanarFreehandROI,
+//    Fiducial,
   } = measurementServiceMappingsFactory(
     measurementService,
     displaySetService,
@@ -113,6 +115,14 @@ const initMeasurementService = (
     PlanarFreehandROI.toMeasurement
   );
 
+  // measurementService.addMapping(
+  //   csTools3DVer1MeasurementSource,
+  //   'Fiducial',
+  //   Fiducial.matchingCriteria,
+  //   Fiducial.toAnnotation,
+  //   Fiducial.toMeasurement
+  // );
+
   // On the UI side, the Calibration Line tool will work almost the same as the
   // Length tool
   measurementService.addMapping(
@@ -122,6 +132,8 @@ const initMeasurementService = (
     Length.toAnnotation,
     Length.toMeasurement
   );
+
+
 
   return csTools3DVer1MeasurementSource;
 };

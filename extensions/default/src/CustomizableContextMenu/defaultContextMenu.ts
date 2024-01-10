@@ -16,7 +16,70 @@ const defaultContextMenu = {
           ],
         },
         {
-          label: 'Add Label',
+          label: 'LV endo',
+          commands: [
+            {
+              commandName: 'labelLVendo',
+            },
+          ],
+        },
+
+        {
+          label: 'LV epi',
+          commands: [
+            {
+              commandName: 'labelLVepi',
+            },
+          ],
+        },
+
+        {
+          label: 'RV endo',
+          commands: [
+            {
+              commandName: 'labelRVendo',
+            },
+          ],
+        },
+
+        {
+          label: 'RV epi',
+          commands: [
+            {
+              commandName: 'labelRVepi',
+            },
+          ],
+        },
+
+        {
+          label: 'LA endo',
+          commands: [
+            {
+              commandName: 'labelLAendo',
+            },
+          ],
+        },
+
+        {
+          label: 'RA endo',
+          commands: [
+            {
+              commandName: 'labelRAendo',
+            },
+          ],
+        },
+
+        {
+          label: 'Aorta desc',
+          commands: [
+            {
+              commandName: 'labelLAortadesc',
+            },
+          ],
+        },
+
+        {
+          label: 'Custom label',
           commands: [
             {
               commandName: 'setMeasurementLabel',

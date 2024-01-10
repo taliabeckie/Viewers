@@ -18,13 +18,13 @@ function ActionButtons({ onExportClick, onCreateReportClick }) {
           className="px-2 py-2 text-base"
           onClick={onExportClick}
         >
-          {t('Export CSV')}
+          {t('Run Algorithm')}
         </LegacyButton>
         <LegacyButton
           className="px-2 py-2 text-base"
           onClick={onCreateReportClick}
         >
-          {t('Create Report')}
+          {t('Save Annotations')}
         </LegacyButton>
       </LegacyButtonGroup>
     </React.Fragment>

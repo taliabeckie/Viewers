@@ -32,6 +32,8 @@ function PanelStudyBrowser({
   ]);
   const [studyDisplayList, setStudyDisplayList] = useState([]);
   const [displaySets, setDisplaySets] = useState([]);
+  const [patientIdentifiers, setPatientIdentifiers] = useState({ patientID: '', patientName: '' });
+  const isMounted = useRef(true);
   const [thumbnailImageSrcMap, setThumbnailImageSrcMap] = useState({});
 
   const onDoubleClickThumbnailHandler = displaySetInstanceUID => {
@@ -82,6 +84,8 @@ function PanelStudyBrowser({
       const mappedStudies = _mapDataSourceStudies(qidoStudiesForPatient);
       const actuallyMappedStudies = mappedStudies.map(qidoStudy => {
         return {
+          patientID: qidoStudy.PatientID,
+          patientName: qidoStudy.PatientName,
           studyInstanceUid: qidoStudy.StudyInstanceUID,
           date: formatDate(qidoStudy.StudyDate),
           description: qidoStudy.StudyDescription,
@@ -89,6 +93,15 @@ function PanelStudyBrowser({
           numInstances: qidoStudy.NumInstances,
         };
       });
+
+      if (isMounted.current) {
+        const patientIdentifiers = {
+          patientID: actuallyMappedStudies[0].patientID,
+          patientName: actuallyMappedStudies[0].patientName,
+        };
+        setPatientIdentifiers(patientIdentifiers);
+        setStudyDisplayList(actuallyMappedStudies);
+      }
 
       setStudyDisplayList(prevArray => {
         const ret = [...prevArray];
@@ -225,18 +238,30 @@ function PanelStudyBrowser({
   const activeDisplaySetInstanceUIDs = viewports.get(activeViewportId)?.displaySetInstanceUIDs;
 
   return (
-    <StudyBrowser
-      tabs={tabs}
-      servicesManager={servicesManager}
-      activeTabName={activeTabName}
-      onDoubleClickThumbnail={onDoubleClickThumbnailHandler}
-      activeDisplaySetInstanceUIDs={activeDisplaySetInstanceUIDs}
-      expandedStudyInstanceUIDs={expandedStudyInstanceUIDs}
-      onClickStudy={_handleStudyClick}
-      onClickTab={clickedTabName => {
-        setActiveTabName(clickedTabName);
-      }}
-    />
+    <>
+      <div className="bg-secondary-main flex flex-col justify-between">
+        <div>
+          <span className="pr-2 text-base font-bold text-white">Patient name:</span>
+          <span className="text-primary-light text-base">{patientIdentifiers.patientName}</span>
+        </div>
+        <div>
+          <span className="pr-2 text-base font-bold text-white">Patient ID:</span>
+          <span className="text-primary-light text-base">{patientIdentifiers.patientID}</span>
+        </div>
+      </div>
+      <StudyBrowser
+        tabs={tabs}
+        servicesManager={servicesManager}
+        activeTabName={activeTabName}
+        onDoubleClickThumbnail={onDoubleClickThumbnailHandler}
+        activeDisplaySetInstanceUIDs={activeDisplaySetInstanceUIDs}
+        expandedStudyInstanceUIDs={expandedStudyInstanceUIDs}
+        onClickStudy={_handleStudyClick}
+        onClickTab={clickedTabName => {
+          setActiveTabName(clickedTabName);
+        }}
+      />
+    </>
   );
 }
 

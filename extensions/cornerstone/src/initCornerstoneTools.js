@@ -70,6 +70,12 @@ export default function initCornerstoneTools(configuration = {}) {
   addTool(ImageOverlayViewerTool);
   addTool(FiducialTool);
 
+    // // // add any existing custom cornerstone tool
+    // const customTools = getCustomCornerstoneTools();
+    // Object.values(customTools).forEach(CustomTool => {
+    //   addTool(CustomTool);
+    // });
+
   // Modify annotation tools to use dashed lines on SR
   const annotationStyle = {
     textBoxFontSize: '15px',
@@ -114,7 +120,7 @@ const toolNames = {
   RectangleScissors: RectangleScissorsTool.toolName,
   SphereScissors: SphereScissorsTool.toolName,
   ImageOverlayViewer: ImageOverlayViewerTool.toolName,
-  FiducialTool: FiducialTool.toolName,
+  Fiducial: FiducialTool.toolName,
 };
 
 export { toolNames };

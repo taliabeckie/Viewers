@@ -53,6 +53,7 @@ function _initToolGroups(toolNames, Enums, toolGroupService, commandsManager) {
       { toolName: toolNames.Angle },
       { toolName: toolNames.CobbAngle },
       { toolName: toolNames.Magnify },
+      { toolName: toolNames.Fiducial },
     ],
     enabled: [{ toolName: toolNames.SegmentationDisplay }],
     disabled: [

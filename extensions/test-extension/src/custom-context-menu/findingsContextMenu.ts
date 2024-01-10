@@ -29,7 +29,7 @@ const findingsContextMenu = {
           ],
         },
         {
-          label: 'Add Label',
+          label: 'Custom Label',
           commands: [
             {
               commandName: 'setMeasurementLabel',

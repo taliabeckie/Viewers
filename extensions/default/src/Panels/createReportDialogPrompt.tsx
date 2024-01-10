@@ -119,7 +119,7 @@ export default function CreateReportDialogPrompt(uiDialogService, { extensionMan
               <div className="mt-3">
                 <Input
                   autoFocus
-                  label="Enter the report name"
+                  label="Provide a name for your report"
                   labelClassName="text-white text-[14px] leading-[1.2]"
                   className="border-primary-main bg-black"
                   type="text"

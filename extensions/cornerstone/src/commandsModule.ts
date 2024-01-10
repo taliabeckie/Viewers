@@ -152,6 +152,69 @@ function commandsModule({
       );
     },
 
+    labelLVendo: ({ uid }) => {
+      const label = 'LV endo';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelLVepi: ({ uid }) => {
+      const label = 'LV epi';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelRVendo: ({ uid }) => {
+      const label = 'RV endo';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelRVepi: ({ uid }) => {
+      const label = 'RV epi';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelLAendo: ({ uid }) => {
+      const label = 'LA endo';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelRAendo: ({ uid }) => {
+      const label = 'RA endo';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
+    labelAortadesc: ({ uid }) => {
+      const label = 'Aorta desc';
+      const measurement = measurementService.getMeasurement(uid);
+      const updatedMeasurement = Object.assign({}, measurement, {
+        label,
+      });
+      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
+    },
+
     /**
      *
      * @param props - containing the updates to apply
@@ -640,6 +703,28 @@ function commandsModule({
     setMeasurementLabel: {
       commandFn: actions.setMeasurementLabel,
     },
+    labelLVendo: {
+      commandFn: actions.labelLVendo,
+    },
+    labelLVepi: {
+      commandFn: actions.labelLVepi,
+    },
+    labelRVendo: {
+      commandFn: actions.labelRVendo,
+    },
+    labelRVepi: {
+      commandFn: actions.labelRVepi,
+    },
+    labelLAendo: {
+      commandFn: actions.labelLAendo,
+    },
+    labelRAendo: {
+      commandFn: actions.labelRAendo,
+    },
+    labelAortadesc: {
+      commandFn: actions.labelAortadesc,
+    },
+
     updateMeasurement: {
       commandFn: actions.updateMeasurement,
     },

@@ -52,8 +52,6 @@ const FIDUCIAL_TOOL_NAME = 'Fiducial';
  *
  */
 
-
-
 export default class FiducialTool extends ProbeTool {
   static toolName = FIDUCIAL_TOOL_NAME;
 
