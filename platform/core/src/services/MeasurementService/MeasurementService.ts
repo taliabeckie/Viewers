@@ -49,6 +49,12 @@ const MEASUREMENT_SCHEMA_KEYS = [
   'source',
   'toolName',
   'metadata',
+  'visible', // TB ADDED
+  'active',
+  'color',
+  'findingSite',
+  'finding',
+  'blackListActions',
   // Todo: we shouldn't need to have all these here.
   'area', // TODO: Add concept names instead (descriptor)
   'mean',
@@ -165,6 +171,56 @@ class MeasurementService extends PubSubService {
    */
   getMeasurements() {
     return [...this.measurements.values()];
+  }
+
+  /**
+   * Creates a new array populated with the result of calling the given iteratee param (function).
+   * on every item of measurements list.
+   *
+   * @param {Function} iteratee Function that is called for each item of measurements list.
+   * @returns a new array populated with modified measurements.
+   */
+  mapMeasurementsBy(iteratee) {
+    const measurements = this.getMeasurements();
+
+    if (measurements && measurements.length && typeof iteratee === 'function') {
+      const _measurements = [...measurements];
+
+      return _measurements.map(iteratee);
+    }
+
+    return [];
+  }
+
+  /**
+   * Executes the given iteratee param (function) once for each item of measurements list.
+   *
+   * @param {Function} iteratee Function that is called for each item of measurements list.
+   */
+  forEachMeasurement(iteratee) {
+    const measurements = this.getMeasurements();
+
+    if (measurements && measurements.length && typeof iteratee === 'function') {
+      const _measurements = [...measurements];
+
+      _measurements.forEach(iteratee);
+    }
+  }
+
+  /**
+   * Returns the first element in the measurements list array that satisfies the provided testing function. If no values satisfy the testing function, undefined is returned.
+   *
+   * @param {Function} comparator Testing function.
+   * @returns a new array populated with modified measurements.
+   */
+  findMeasurementBy(comparator) {
+    if (typeof comparator !== 'function') {
+      return;
+    }
+
+    const measurements = this.getMeasurements() || [];
+
+    return measurements.find(comparator);
   }
 
   /**
@@ -364,6 +420,19 @@ class MeasurementService extends PubSubService {
   }
 
   /**
+   * Update all the given measurement items from measurements list.
+   * Each item from the first param list will be updated into measurements list only if it already exists on it.
+   *
+   * @param {Measurement[]} measurements list of measurements to be updated.
+   * @param {boolean} [notYetUpdatedAtSource=false] Tell whether correspondent change is already updated on source or not.
+   */
+  updateMany(measurements = [], notYetUpdatedAtSource = false) {
+    measurements.forEach(measurement => {
+      this.update(measurement.uid, measurement, notYetUpdatedAtSource);
+    });
+  }
+
+  /**
    * Add a raw measurement into a source so that it may be
    * Converted to/from annotation in the same way. E.g. import serialized data
    * of the same form as the measurement source.
@@ -444,6 +513,46 @@ class MeasurementService extends PubSubService {
     }
 
     return newMeasurement.uid;
+  }
+
+  measurementToAnnotation(source, annotationType, measurement) {
+    if (!this._isValidSource(source)) {
+      throw new Error('Invalid source.');
+    }
+
+    if (!annotationType) {
+      throw new Error('No source annotationType provided.');
+    }
+
+    const sourceInfo = this._getSourceToString(source);
+
+    if (!this._sourceHasMappings(source)) {
+      throw new Error(`No measurement mappings found for '${sourceInfo}' source. Exiting early.`);
+    }
+
+    let annotation = {};
+    try {
+      const sourceMappings = this.mappings[source.uid];
+      const { toAnnotationSchema } = sourceMappings.find(
+        mapping => mapping.annotationType === annotationType
+      );
+
+      /* Convert measurement */
+      annotation = toAnnotationSchema(measurement);
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        `Failed to map '${sourceInfo}' measurement to annotation with annotationType ${annotationType}:`,
+        error.message
+      );
+    }
+
+    const newAnnotation = {
+      ...annotation,
+      modifiedTimestamp: Math.floor(Date.now() / 1000),
+    };
+
+    return newAnnotation;
   }
 
   /**
@@ -615,6 +724,14 @@ class MeasurementService extends PubSubService {
     this._broadcastEvent(EVENTS.JUMP_TO_MEASUREMENT_VIEWPORT, consumableEvent);
     this._broadcastEvent(EVENTS.JUMP_TO_MEASUREMENT_LAYOUT, consumableEvent);
   }
+
+  // getJumpToMeasurement(viewportIndex) {
+  //   return this._jumpToMeasurementCache[viewportIndex];
+  // }
+
+  // removeJumpToMeasurement(viewportIndex) {
+  //   delete this._jumpToMeasurementCache[viewportIndex];
+  // }
 
   _getSourceUID(name, version) {
     const { sources } = this;

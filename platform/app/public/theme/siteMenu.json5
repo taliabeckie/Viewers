@@ -1,0 +1,182 @@
+{
+  contextMenus: {
+    codingValues: {
+      'SCT:87878005': {
+        text: 'Left Ventricle',
+        color: 'blue',
+        joinedOpenContour: true,
+      },
+      'SCT:53085002': {
+        text: 'Right Ventricle',
+        color: 'red',
+        joinedOpenContour: true,
+      },
+      'SCT:34202007': {
+        text: 'Aortic Valve',
+        color: 'yellow',
+      },
+      'SCT:39057004': {
+        text: 'Pulmonic Valve',
+        color: 'magenta',
+      },
+      'SCT:45341000': {
+        text: 'Pulmonary Trunk',
+        color: 'cyan',
+      },
+      'SCT:81040000': {
+        text: 'Pulmonary Artery',
+        color: 'white',
+      },
+      'SCT:443096004': {
+        text: 'Aorta to Pulmonary Artery Connection',
+        color: 'darkgreen',
+      },
+      'SCT:371861004': {
+        text: 'Mild intimal coronary irregularities',
+        color: 'green',
+      },
+      'SCT:194983005': {
+        text: 'Aortic insufficiency',
+        color: 'darkred',
+      },
+    },
+    imageAreaMenus: {
+      // Show the site selection sub-menu
+      'siteSelectionMenu#2': {
+        // this is nested menu of siteSelectionMenu#1
+        id: 'siteSelectionMenu#2',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'siteSelectionMenu#1', // go back approach
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:45341000',
+          },
+        ],
+      },
+      'siteSelectionMenu#1': {
+        id: 'siteSelectionMenu#1',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'siteSelectionMenu', // go back approach
+          },
+          {
+            label: 'Pulmonary Arteries Sub',
+            actionType: 'SubMenu',
+            subMenu: 'siteSelectionMenu#2', // fourth level
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:81040000',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:34202007',
+          },
+        ],
+      },
+      siteSelectionMenu: {
+        id: 'siteSelectionMenu', // this id can not be changed,
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            label: 'Pulmonary Arteries',
+            actionType: 'SubMenu',
+            subMenu: 'siteSelectionMenu#1', // third level
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:87878005',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:53085002',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:34202007',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SCT:443096004',
+          },
+        ],
+      },
+      'findingSelectionMenu#1': {
+        id: 'findingSelectionMenu#1', // this id can not be changed
+        attribute: 'finding', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            actionType: 'SiteSelection',
+            finding: 'SCT:194983005',
+          },
+        ],
+      },
+      findingSelectionMenu: {
+        id: 'findingSelectionMenu', // this id can not be changed
+        attribute: 'finding', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            label: 'Severe Findings',
+            actionType: 'SubMenu',
+            subMenu: 'findingSelectionMenu#1', // third level
+          },
+          {
+            actionType: 'SiteSelection',
+            finding: 'SCT:371861004',
+          },
+        ],
+      },
+      forExistingMeasurement: {
+        id: 'forExistingMeasurement',
+        items: [
+          {
+            label: 'Site',
+            actionType: 'SubMenu',
+            subMenu: 'siteSelectionMenu',
+          },
+          {
+            label: 'Finding',
+            actionType: 'SubMenu',
+            subMenu: 'findingSelectionMenu',
+          },
+          {
+            label: 'Delete measurement',
+            actionType: 'Delete',
+          },
+          {
+            label: 'Add Custom Label',
+            actionType: 'SetLabel',
+          },
+        ],
+      },
+    },
+  },
+}

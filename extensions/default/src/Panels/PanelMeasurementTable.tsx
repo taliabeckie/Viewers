@@ -5,7 +5,10 @@ import { utils, ServicesManager } from '@ohif/core';
 import { MeasurementTable, Dialog, Input, useViewportGrid, ButtonEnums } from '@ohif/ui';
 import ActionButtons from './ActionButtons';
 import debounce from 'lodash.debounce';
-// import ConfigPoint from 'config-point';
+import ResultChart from '../../../../ucalgary-extension/src/external-algorithm/resultChart/ResultChart';
+import ConfigPoint from 'config-point';
+import ResultReportItem from '../../../../ucalgary-extension/src/external-algorithm/resultReport/ResultReportItem';
+import { useExternalAlgorithm } from '../../../../ucalgary-extension/src/contexts';
 import Label from '../../../../platform/ui/src/components/Label/Label';
 
 import createReportDialogPrompt, {
@@ -15,6 +18,17 @@ import createReportAsync from '../Actions/createReportAsync';
 import findSRWithSameSeriesDescription from '../utils/findSRWithSameSeriesDescription';
 
 const { downloadCSVReport } = utils;
+
+// tools with measurements to display inside the panel
+const MEASUREMENT_TOOLS = [
+  'EllipticalROI',
+  'RectangleROI',
+  'Length',
+  'Bidirectional',
+  'PlanarFreehandROI',
+  'Fiducial',
+  'ArrowAnnotate',
+];
 
 export default function PanelMeasurementTable({
   servicesManager,
@@ -29,6 +43,8 @@ export default function PanelMeasurementTable({
     servicesManager as ServicesManager
   ).services;
   const [displayMeasurements, setDisplayMeasurements] = useState([]);
+
+  //const [{ reports = [], sortInfo: reportsSortInfo }] = useExternalAlgorithm();
 
   useEffect(() => {
     const debouncedSetDisplayMeasurements = debounce(setDisplayMeasurements, 100);
@@ -233,7 +249,7 @@ export default function PanelMeasurementTable({
     setInputValue2(value);
   };
 
-  // const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);  //ADD LATER - NEEDS EXTERNAL ALGO
+  //  const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo); //ADD LATER - NEEDS EXTERNAL ALGO
   const [inputValue, setInputValue] = useState(''); //PHASELABELBUTTON TB
   const [inputValue2, setInputValue2] = useState(''); //PHASELABELBUTTON TB
 
@@ -301,19 +317,47 @@ export default function PanelMeasurementTable({
         />
       </div>
 
-      <div className="flex justify-center p-4">
+      <div className="flex flex-grow-0 justify-center p-4">
         <ActionButtons
           onExportClick={exportReport}
           onClearMeasurementsClick={clearMeasurements}
           onCreateReportClick={createReport}
         />
       </div>
+
+      {/* {(aiResultsProps?.items?.length || aiResultsProps?.reportInfos?.length) && (
+        <div className="text-primary-light flex flex-grow-0 justify-center p-2 uppercase">
+          Results
+        </div>
+      )}
+      {aiResultsProps?.items?.length && (
+        <div className="invisible-scrollbar flex-grow overflow-y-auto overflow-x-hidden">
+          <ResultChart {...aiResultsProps}></ResultChart>
+        </div>
+      )}
+      {aiResultsProps?.reportInfos?.length && (
+        <div className="flex-grow-0">
+          <ResultReportItem {...aiResultsProps}></ResultReportItem>
+        </div>
+      )} */}
     </>
   );
 }
 
 PanelMeasurementTable.propTypes = {
-  servicesManager: PropTypes.instanceOf(ServicesManager).isRequired,
+  servicesManager: PropTypes.shape({
+    services: PropTypes.shape({
+      MeasurementService: PropTypes.shape({
+        getMeasurements: PropTypes.func.isRequired,
+        subscribe: PropTypes.func.isRequired,
+        EVENTS: PropTypes.object.isRequired,
+        VALUE_TYPES: PropTypes.object.isRequired,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
+  commandsManager: PropTypes.shape({
+    runCommand: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 function _getMappedMeasurements(measurementService) {
@@ -334,41 +378,46 @@ function _getMappedMeasurements(measurementService) {
  */
 function _mapMeasurementToDisplay(measurement, index, types) {
   const {
-    displayText: baseDisplayText,
     uid,
-    label: baseLabel,
+    label,
     type,
-    selected,
-    findingSites,
+    displayText, // Reference IDs
+    active,
+    visible,
     finding,
+    findingSite,
+    color,
   } = measurement;
 
-  const firstSite = findingSites?.[0];
-  const label = baseLabel || finding?.text || firstSite?.text || '(empty)';
-  let displayText = baseDisplayText || [];
-  if (findingSites) {
-    const siteText = [];
-    findingSites.forEach(site => {
-      if (site?.text !== label) {
-        siteText.push(site.text);
+  const getFindingText = (...params) => {
+    const [first, ...rest] = params || [];
+    const otherTexts = rest.filter(value => !!value);
+
+    if (!first || !first.text) {
+      if (otherTexts && otherTexts.length) {
+        return getFindingText(...otherTexts);
       }
-    });
-    displayText = [...siteText, ...displayText];
-  }
-  if (finding && finding?.text !== label) {
-    displayText = [finding.text, ...displayText];
-  }
+
+      return;
+    }
+
+    return first.text + (!otherTexts.length ? '' : ` /${getFindingText(...otherTexts)}`);
+  };
+
+  const _findingText = getFindingText(finding, findingSite);
+  const _label = label || _findingText || '(empty)';
+
+  const prefix = (_findingText && label && [_findingText]) || [];
+  const _displayText = [...prefix, ...(displayText || [])];
 
   return {
     uid,
-    label,
-    baseLabel,
+    label: _label,
     measurementType: type,
-    displayText,
-    baseDisplayText,
-    isActive: selected,
-    finding,
-    findingSites,
+    color: color,
+    displayText: _displayText,
+    active,
+    visible,
   };
 }
 

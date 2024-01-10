@@ -1,0 +1,578 @@
+{
+  // Activate the 1x2 and 2x2 default hanging protocols
+  hangingProtocolConfig: {
+    protocols: {
+      '1x2': {
+        id: '1x2',
+        priority: 200,
+      },
+      '2x2': {
+        id: '2x2',
+        priority: 300,
+      },
+    },
+  },
+  // context menu definition
+  contextMenus: {
+    apiEndpoints: {
+      GenerateContours: 'https://api.davincitech.ca/api/generate-contours/',
+      APIPrediction: 'https://api.davincitech.ca/api/run-ai-prediction/',
+      StoreReport: 'https://api.davincitech.ca/api/workspace-state/',
+      ErrorTest: 'http://localhost:5000/dicomweb/api/ai-error',
+      ImmediateReturn: 'http://localhost:5000/dicomweb/api/immediate-return',
+    },
+    codingValues: {
+      // Findings
+      'SCT:371861004': {
+        text: 'Mild intimal coronary irregularities',
+        color: 'green',
+      },
+      'SCT:194983005': {
+        text: 'Aortic insufficiency',
+        color: 'darkred',
+      },
+      // Series labels
+      //   'SegmentationCardiac:es-lax': {
+      //    text: 'End-Systole-LAX',
+      //     color: '#000000',
+      //     seriesLabel: true,
+      //   },
+      //   'SegmentationCardiac:es-sax': {
+      //     text: 'End-Systole-SAX',
+      //      color: '#000000',
+      //     seriesLabel: true,
+      //    },
+      //   'SegmentationCardiac:ed': {
+      //     text: 'End-Diastole',
+      //    color: '#000000',
+      //     seriesLabel: true,
+      //   },
+      'SegmentationCardiac:4ch': {
+        text: '4-chamber',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SegmentationCardiac:3ch': {
+        text: '3-chamber',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:399232001': {
+        text: '2-chamber',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:103340004': {
+        text: 'SAX',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SegmentationCardiac:av': {
+        text: 'AV',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:91134007': {
+        text: 'MV',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:122972007': {
+        text: 'PV',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SegmentationCardiac:ao_cc': {
+        text: 'Aorta - candycane',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:24422004': {
+        text: 'Axial',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:81654009': {
+        text: 'Coronal',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SCT:30730003': {
+        text: 'Sagittal',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      'SegmentationCardiac:other': {
+        text: 'Other',
+        color: '#000000',
+        seriesLabel: true,
+      },
+      // fiducial
+      'SegmentationCardiac:20000101': {
+        text: 'RVI site - AHA',
+        color: '#191970',
+      },
+      'SegmentationCardiac:20000102': {
+        text: 'RVI site - other',
+        color: '#0000FF',
+      },
+      'SegmentationCardiac:20000201': {
+        text: 'AV mid',
+        color: '#4169E1',
+      },
+      'SegmentationCardiac:20000202': {
+        text: 'AV RCC',
+        color: '#7B68EE',
+      },
+      'SegmentationCardiac:20000203': {
+        text: 'AV LCC',
+        color: '#6495ED',
+      },
+      'SegmentationCardiac:20000204': {
+        text: 'AV NCC',
+        color: '#1E90FF',
+      },
+      'SegmentationCardiac:20000301': {
+        text: 'MV mid',
+        color: '#00BFFF',
+      },
+      'SegmentationCardiac:20000401': {
+        text: 'PV mid',
+        color: '#87CEEB',
+      },
+      'SegmentationCardiac:20000501': {
+        text: 'TV mid',
+        color: '#87CEFA',
+      },
+      'SegmentationCardiac:20000601': {
+        text: 'LM ostium',
+        color: '#B0E0E6',
+      },
+      'SegmentationCardiac:20000602': {
+        text: 'RCA ostium',
+        color: '#F0F8FF',
+      },
+      'SegmentationCardiac:20000603': {
+        text: 'LCx ostium',
+        color: '#B0C4DE',
+      },
+      'SegmentationCardiac:20000701': {
+        text: 'Other',
+        color: '#8A2BE2',
+      },
+      // contour
+      'SegmentationCardiac:10000101': {
+        text: 'LV endo',
+        color: 'red',
+        joinedOpenContour: true,
+      },
+      'SegmentationCardiac:10000102': {
+        text: 'LV epi',
+        color: 'green',
+      },
+      'SegmentationCardiac:10000201': {
+        text: 'RV endo',
+        color: 'blue',
+      },
+      'SegmentationCardiac:10000202': {
+        text: 'RV epi',
+        color: '#ADD8E6',
+      },
+      'SegmentationCardiac:10000301': {
+        text: 'LA endo',
+        color: 'orange',
+        joinedOpenContour: true,
+      },
+      'SegmentationCardiac:10000401': {
+        text: 'RA endo',
+        color: 'purple',
+        joinedOpenContour: true,
+      },
+      'SegmentationCardiac:10000501': {
+        text: 'Aorta desc',
+        color: 'violet',
+      },
+    },
+    imageAreaMenus: {
+      // Show the site selection sub-menu
+      'siteSelectionContourMenu#1': {
+        id: 'siteSelectionContourMenu#1',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000101',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000102',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000201',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000202',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000301',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000401',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000501',
+          },
+        ],
+      },
+      'siteSelectionFiducialMenu#1': {
+        id: 'siteSelectionFiducialMenu#1',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000101',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000102',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000201',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000202',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000203',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000204',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000301',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000401',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000501',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000601',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000602',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000603',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000701',
+          },
+        ],
+      },
+      siteSelectionMenu: {
+        id: 'siteSelectionMenu', // this id can not be changed,
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            label: 'Contour',
+            actionType: 'SubMenu',
+            checkFunction: {
+              configOperation: 'safe',
+              value: '"PlanarFreehandROI"===toolName',
+            },
+            delegating: true,
+            subMenu: 'siteSelectionContourMenu#1', // third level delegation to merge with second level
+          },
+          {
+            label: 'Fiducial',
+            actionType: 'SubMenu',
+            checkFunction: {
+              configOperation: 'safe',
+              value: '"Fiducial"===toolName',
+            },
+            delegating: true,
+            subMenu: 'siteSelectionFiducialMenu#1', // third level delegation to merge with second level
+          },
+        ],
+      },
+      'findingSelectionMenu#1': {
+        id: 'findingSelectionMenu#1', // this id can not be changed
+        attribute: 'finding', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            actionType: 'SiteSelection',
+            finding: 'SCT:194983005',
+          },
+        ],
+      },
+      findingSelectionMenu: {
+        id: 'findingSelectionMenu', // this id can not be changed
+        attribute: 'finding', // used to define reference property value
+        items: [
+          {
+            label: 'Go Back',
+            actionType: 'SubMenu',
+            actionCategory: 'History', // tells whether a actionType submenu is a 'history' navigation or not.
+            subMenu: 'forExistingMeasurement', // go back approach
+          },
+          {
+            label: 'Severe Findings',
+            actionType: 'SubMenu',
+            subMenu: 'findingSelectionMenu#1', // third level
+          },
+          {
+            actionType: 'SiteSelection',
+            finding: 'SCT:371861004',
+          },
+        ],
+      },
+      forExistingMeasurement: {
+        id: 'forExistingMeasurement',
+        items: [
+          {
+            label: 'Site',
+            actionType: 'SubMenu',
+            subMenu: 'siteSelectionMenu',
+          },
+          {
+            label: 'Finding',
+            actionType: 'SubMenu',
+            subMenu: 'findingSelectionMenu',
+          },
+          {
+            label: 'Delete measurement',
+            actionType: 'Delete',
+          },
+          {
+            label: 'Add Custom Label',
+            actionType: 'SetLabel',
+          },
+        ],
+      },
+      seriesLabellingSelectionMenu: {
+        id: 'seriesLabellingSelectionMenu',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SegmentationCardiac:4ch',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SegmentationCardiac:3ch',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:399232001',
+          },
+          //   {
+          //     actionType: 'SetSeriesLabel',
+          //     findingSite: 'SegmentationCardiac:es-lax',
+          //    },
+          //     {
+          //      actionType: 'SetSeriesLabel',
+          //       findingSite: 'SegmentationCardiac:es-sax',
+          //    },
+          // {
+          //  actionType: 'SetSeriesLabel',
+          //   findingSite: 'SegmentationCardiac:ed',
+          //  },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:103340004',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SegmentationCardiac:av',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:91134007',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:122972007',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SegmentationCardiac:ao_cc',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:24422004',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:81654009',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SCT:30730003',
+          },
+          {
+            actionType: 'SetSeriesLabel',
+            findingSite: 'SegmentationCardiac:other',
+          },
+        ],
+      },
+      fiducialSiteSelectionMenu: {
+        id: 'fiducialSiteSelectionMenu',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Delete measurement',
+            actionType: 'Delete',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000101',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000102',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000201',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000202',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000203',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000204',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000301',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000401',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000501',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000601',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000602',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000603',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:20000701',
+          },
+        ],
+      },
+      contourSiteSelectionMenu: {
+        id: 'contourSiteSelectionMenu',
+        attribute: 'findingSite', // used to define reference property value
+        items: [
+          {
+            label: 'Delete measurement',
+            actionType: 'Delete',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000101',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000102',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000201',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000202',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000301',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000401',
+          },
+          {
+            actionType: 'SiteSelection',
+            findingSite: 'SegmentationCardiac:10000501',
+          },
+        ],
+      },
+    },
+  },
+  reportStorage: {
+    storeToAPI: true,
+    storeToDICOM: true,
+  },
+  externalAlgorithm: {
+    results: {
+      colorify: [
+        [0, 'rgb(45,166,213)'],
+        [10, 'rgb(214,234,174)'],
+        [30, 'rgb(197,233,88)'],
+        [80, 'rgb(246,154,84)'],
+        [90, 'rgb(253,13,29)'],
+      ],
+    },
+  },
+  toolStyles: {
+    global: {
+      colorHighlighted: 'yellow',
+      textBoxColorHighlighted: 'yellow',
+      colorSelected: '#00FFFF',
+      textBoxColorSelected: '#00FFFF',
+      color: '#10fc0b',
+      textBoxColor: '#10fc0b',
+      lineDash: '5',
+      lineDashSelected: '[]',
+      lineDashHighlighted: '[]',
+    },
+  },
+}

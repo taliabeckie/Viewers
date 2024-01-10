@@ -3,13 +3,31 @@ import { ServicesManager } from '@ohif/core';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { annotation as CsAnnotation } from '@cornerstonejs/tools';
+import { Icon } from '../';
 
 import MeasurementItem from './MeasurementItem';
 
-const MeasurementTable = ({ data, title, onClick, onEdit, servicesManager }) => {
+function hasAnyVisible(data = []) {
+  return data.some(measurement => !!measurement.visible);
+}
+
+function isColorTransparent(color) {
+  return typeof color === 'string' && color === '#000000';
+}
+
+const MeasurementTable = ({
+  data,
+  title,
+  onClick,
+  onEdit,
+  onChangeVisibility,
+  onDelete,
+  servicesManager,
+}) => {
   servicesManager = servicesManager as ServicesManager;
   const { customizationService } = servicesManager.services;
   const { t } = useTranslation('MeasurementTable');
+
   const amount = data.length;
 
   const itemCustomization = customizationService.getCustomization('MeasurementItem', {
@@ -24,6 +42,14 @@ const MeasurementTable = ({ data, title, onClick, onEdit, servicesManager }) => 
     <div>
       <div className="bg-secondary-main flex justify-between px-2 py-1">
         <span className="text-base font-bold uppercase tracking-widest text-white">{t(title)}</span>
+
+        {data.length !== 0 && (
+          <Icon
+            className={'ml-auto mr-6 w-4 cursor-pointer text-white'}
+            name={hasAnyVisible(data) ? 'eye-visible' : 'eye-hidden'}
+            onClick={onChangeVisibility}
+          />
+        )}
         <span className="text-base font-bold text-white">{amount}</span>
       </div>
       <div className="ohif-scrollbar max-h-112 overflow-hidden">
@@ -37,13 +63,19 @@ const MeasurementTable = ({ data, title, onClick, onEdit, servicesManager }) => 
                 key={measurementItem.uid}
                 uid={measurementItem.uid}
                 index={index + 1}
+                color={measurementItem.color}
                 label={measurementItem.label}
                 isActive={measurementItem.isActive}
+                visible={measurementItem.visible}
                 isLocked={isLocked}
                 displayText={measurementItem.displayText}
                 item={measurementItem}
                 onClick={onClick}
                 onEdit={onEdit}
+                onChangeVisibility={
+                  isColorTransparent(measurementItem.color) ? undefined : onChangeVisibility
+                }
+                onDelete={onDelete}
               />
             );
           })}
@@ -80,6 +112,8 @@ MeasurementTable.propTypes = {
   ),
   onClick: PropTypes.func,
   onEdit: PropTypes.func,
+  onChangeVisibility: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 export default MeasurementTable;
