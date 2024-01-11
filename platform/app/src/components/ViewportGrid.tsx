@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useMemo} from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { ServicesManager, Types, MeasurementService } from '@ohif/core';
 import { ViewportGrid, ViewportPane, useViewportGrid } from '@ohif/ui';
@@ -27,7 +27,7 @@ function ViewerViewportGrid(props) {
    */
   const activateViewportBeforeInteraction = useMemo(() => {
     const [appConfig] = useAppConfig();
-    return appConfig?.activateViewportBeforeInteraction ?? true;
+    return appConfig?.activateViewportBeforeInteraction ?? false;
   }, []);
 
   /**

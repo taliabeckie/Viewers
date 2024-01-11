@@ -2,7 +2,7 @@ import _viewportToSelection from './viewportToSelection';
 import _mapToSimpleSelection from './mapToSimpleSelection';
 import _createAnnotations from './createAnnotations';
 import _getAllViewports from '../utils/getAllViewports';
-import _getViewportEnabledElement from '../utils/getViewportEnabledElement';
+import _getViewportEnabledElement from '../../../extensions/cornerstone/src/utils/getActiveViewportEnabledElement';
 import { metaData } from '@cornerstonejs/core';
 
 import { Dialog } from '@ohif/ui';
@@ -19,12 +19,8 @@ import { once } from 'lodash';
  */
 export default function createExternalAlgorithm(props) {
   const { servicesManager, commandsManager } = props;
-  const {
-    ViewportGridService,
-    UINotificationService,
-    UIDialogService,
-    ExternalAlgorithmService,
-  } = servicesManager.services;
+  const { ViewportGridService, UINotificationService, UIDialogService, ExternalAlgorithmService } =
+    servicesManager.services;
 
   const { apiEndpoints } = ConfigPoint.getConfig('contextMenus');
   console.log('External API endpoints: ', apiEndpoints);
@@ -44,17 +40,17 @@ export default function createExternalAlgorithm(props) {
   };
 
   const bodyList = (items, onSelectHandler) => (
-    <div className="p-4 bg-primary-dark flex flex-col justify-between">
+    <div className="bg-primary-dark flex flex-col justify-between p-4">
       {items.map(item => {
         let itemToDisplay = item.commandOptions.name;
 
-        if (!!item.commandOptions?.algorithm?.version) {
+        if (item.commandOptions?.algorithm?.version) {
           itemToDisplay += ` (v: ${item.commandOptions?.algorithm?.version})`;
         }
         return (
           <span
             key={item.id}
-            className="cursor-pointer hover:bg-secondary-dark py-2 text-base text-white"
+            className="hover:bg-secondary-dark cursor-pointer py-2 text-base text-white"
             onClick={onSelectHandler.bind(null, { item })}
           >
             {itemToDisplay}
@@ -66,7 +62,9 @@ export default function createExternalAlgorithm(props) {
 
   const runExternalAlgorithm = runProps => {
     const { items = [] } = runProps;
-    if (!UIDialogService) return;
+    if (!UIDialogService) {
+      return;
+    }
     console.log('Running External Algorithm');
     const onSubmitHandler = ({ action }) => {
       UIDialogService.dismiss({ id: dialogId });
@@ -99,13 +97,7 @@ export default function createExternalAlgorithm(props) {
   };
 
   const initiateExternalAlgorithm = runProps => {
-    const {
-      algorithm,
-      endpointName,
-      name,
-      seriesInstanceUID = '',
-      sopInstanceUID = '',
-    } = runProps;
+    const { algorithm, endpointName, name, seriesInstanceUID = '', sopInstanceUID = '' } = runProps;
     console.log('External Algorithm initiate', name);
     const endpointUrl = apiEndpoints[endpointName];
 
@@ -123,15 +115,12 @@ export default function createExternalAlgorithm(props) {
       selection,
       structuredReport,
     };
-    console.log(
-      'External Algorithm post data=\n',
-      JSON.stringify(message, null, 2)
-    );
+    console.log('External Algorithm post data=\n', JSON.stringify(message, null, 2));
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', endpointUrl, true);
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
       //Call a function when the state changes.
       if (xhr.readyState == 4) {
         switch (xhr.status) {
@@ -236,7 +225,7 @@ export default function createExternalAlgorithm(props) {
       xhr.responseType = 'json';
       xhr.open('GET', `${endpointUrl}${slashIfNeeded}${jobId}/`, true);
 
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         //Call a function when the state changes.
         if (xhr.readyState == 4) {
           statusCode = xhr.status;
@@ -252,9 +241,7 @@ export default function createExternalAlgorithm(props) {
                   results,
                 });
                 completed = jobStatus;
-              } else if (
-                ['SUBMITTED', 'PROGRESS', 'PROCESSING'].includes(jobStatus)
-              ) {
+              } else if (['SUBMITTED', 'PROGRESS', 'PROCESSING'].includes(jobStatus)) {
                 completed = jobProgress;
                 console.log('Setting next timeout, with completed=', completed);
                 setTimeout(checkStatus, 100);
@@ -287,11 +274,7 @@ export default function createExternalAlgorithm(props) {
     };
 
     const onErrorHandler = statusCode => {
-      _showFailedNotification(
-        runProps,
-        `External Algorithm failed for job ${jobId}`,
-        statusCode
-      );
+      _showFailedNotification(runProps, `External Algorithm failed for job ${jobId}`, statusCode);
     };
 
     const onceOnError = once(onErrorHandler);
@@ -355,9 +338,7 @@ export default function createExternalAlgorithm(props) {
         // do nothing with result.
         break;
       default:
-        throw new Error(
-          `No handler for algorithm results for ${algorithmName}`
-        );
+        throw new Error(`No handler for algorithm results for ${algorithmName}`);
     }
   };
 

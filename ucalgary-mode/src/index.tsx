@@ -3,11 +3,29 @@ import { id } from './id';
 import toolbarButtons from './toolbarButtons';
 import initToolGroups from './initToolGroups';
 
+//const hotkeys =
+// ((window || {}).config || {})['hotkeys'] ||
+// coreHotkeys.defaults.hotkeyBindings;
+
+const configs = {
+  Length: {},
+  PlanarFreehandROI: {
+    alwaysRenderOpenContourHandles: {
+      enabled: true,
+      radius: 2,
+    },
+    interpolation: {
+      interpolateOnAdd: false,
+      interpolateOnEdit: false,
+    },
+  },
+};
+
 const cornerstone = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
 };
 
-const ucalgary = {
+const ohif = {
   layout: '@ohif/extension-default.layoutTemplateModule.viewerLayout',
   sopClassHandler: '@ohif/extension-default.sopClassHandlerModule.stack',
   hangingProtocol: '@ohif/extension-default.hangingProtocolModule.default',
@@ -15,13 +33,40 @@ const ucalgary = {
   rightPanel: '@ohif/extension-default.panelModule.measure',
 };
 
-/**
- * Just two dependencies to be able to render a viewport with panels in order
- * to make sure that the mode is working.
- */
+const labeldi = {
+  measurements: '@labeldi/extension-default.panelModule.measure',
+};
+
+const tracked = {
+  measurements: '@ohif/extension-measurement-tracking.panelModule.trackedMeasurements',
+  thumbnailList: '@ohif/extension-measurement-tracking.panelModule.seriesList',
+  viewport: '@ohif/extension-measurement-tracking.viewportModule.cornerstone-tracked',
+};
+
+const dicomsr = {
+  sopClassHandler: '@ohif/extension-cornerstone-dicom-sr.sopClassHandlerModule.dicom-sr',
+  viewport: '@ohif/extension-cornerstone-dicom-sr.viewportModule.dicom-sr',
+};
+
+const dicomvideo = {
+  sopClassHandler: '@ohif/extension-dicom-video.sopClassHandlerModule.dicom-video',
+  viewport: '@ohif/extension-dicom-video.viewportModule.dicom-video',
+};
+
+const dicompdf = {
+  sopClassHandler: '@ohif/extension-dicom-pdf.sopClassHandlerModule.dicom-pdf',
+  viewport: '@ohif/extension-dicom-pdf.viewportModule.dicom-pdf',
+};
+
 const extensionDependencies = {
   '@ohif/extension-default': '^3.0.0',
   '@ohif/extension-cornerstone': '^3.0.0',
+  '@ohif/extension-measurement-tracking': '^3.0.0',
+  '@ohif/extension-cornerstone-dicom-sr': '^3.0.0',
+  '@ohif/extension-dicom-pdf': '^3.0.1',
+  '@ohif/extension-dicom-video': '^3.0.1',
+  // '@labeldi/extension-default': '^3.0.0',
+  //'@radicalimaging/hp-extension': '^3.3.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -32,7 +77,7 @@ function modeFactory({ modeConfiguration }) {
      */
     id,
     // routeName: 'viewer',
-    // routeName: 'ucalgary', //eventually switch to this
+
     /**
      * Mode name, which is displayed in the viewer's UI in the workList, for the
      * user to select the mode.
@@ -91,7 +136,7 @@ function modeFactory({ modeConfiguration }) {
         'Pan',
         'Layout',
         'MoreTools',
-        //     'Cine',
+        //    'Cine',
       ]);
     },
     /**
@@ -105,12 +150,14 @@ function modeFactory({ modeConfiguration }) {
         toolbarService,
         segmentationService,
         cornerstoneViewportService,
+        ExternalAlgorithmService,
       } = servicesManager.services;
 
       toolGroupService.destroy();
       syncGroupService.destroy();
       segmentationService.destroy();
       cornerstoneViewportService.destroy();
+      ExternalAlgorithmService.clearResults();
     },
     /** */
     validationTags: {
@@ -136,18 +183,19 @@ function modeFactory({ modeConfiguration }) {
      */
     routes: [
       {
-        path: 'template', //defines the route path to access the built applications for that route
+        path: 'longitudinal', //defines the route path to access the built applications for that route. Previously worked with 'template'
         layoutTemplate: ({ location, servicesManager }) => {
           //defines the layout for the specified route
           return {
-            id: ucalgary.layout,
+            id: ohif.layout,
             props: {
-              leftPanels: [ucalgary.leftPanel],
-              rightPanels: [ucalgary.rightPanel],
+              leftPanels: [ohif.leftPanel],
+              rightPanels: [ohif.rightPanel],
+              //  rightPanels: [labeldi.measurements],
               viewports: [
                 {
                   namespace: cornerstone.viewport,
-                  displaySetsToDisplay: [ucalgary.sopClassHandler],
+                  displaySetsToDisplay: [ohif.sopClassHandler],
                 },
               ],
             },
@@ -166,7 +214,7 @@ function modeFactory({ modeConfiguration }) {
      * Used to initialize 'DisplaySetService' with the provided SOPClass modules.
      * Handles the creation of the displaySets.
      */
-    sopClassHandlers: [ucalgary.sopClassHandler],
+    sopClassHandlers: [ohif.sopClassHandler],
     /** hotkeys for mode */
     hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };

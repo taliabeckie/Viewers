@@ -8,6 +8,7 @@ import CobbAngle from './CobbAngle';
 import Angle from './Angle';
 import PlanarFreehandROI from './PlanarFreehandROI';
 import RectangleROI from './RectangleROI';
+import { getCustomToolsMappingFactory } from './customToolsMappingFactory';
 
 const measurementServiceMappingsFactory = (
   measurementService: MeasurementService,
@@ -197,6 +198,23 @@ const measurementServiceMappingsFactory = (
       ],
     },
   };
+
+  // set up custom tools mapping factory.
+  const customToolsMappingFactory = getCustomToolsMappingFactory();
+  Object.keys(customToolsMappingFactory).forEach(factoryKey => {
+    const customToolMappingFactory = customToolsMappingFactory[factoryKey];
+    factories[factoryKey] = {
+      toAnnotation: customToolMappingFactory.toAnnotation,
+      toMeasurement: csToolsAnnotation =>
+        customToolMappingFactory.toMeasurement(
+          csToolsAnnotation,
+          displaySetService,
+          cornerstoneViewportService,
+          _getValueTypeFromToolType
+        ),
+      matchingCriteria: customToolMappingFactory.getMatchingCriteriaArray(MeasurementService),
+    };
+  });
 
   return factories;
 };

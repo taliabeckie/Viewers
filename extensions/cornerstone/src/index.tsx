@@ -31,6 +31,20 @@ import { measurementMappingUtils } from './utils/measurementServiceMappings';
 import type { PublicViewportOptions } from './services/ViewportService/Viewport';
 import ImageOverlayViewerTool from './tools/ImageOverlayViewerTool';
 
+import getSOPInstanceAttributes from './utils/measurementServiceMappings/utils/getSOPInstanceAttributes.js';
+import {
+  getAnnotationColor,
+  setAnnotationColor,
+  setAnnotationLineDash,
+} from './utils/measurementServiceMappings/utils/style.js';
+import {
+  isAnnotationSelected,
+  setAnnotationSelected,
+} from './utils/measurementServiceMappings/utils/selection.js';
+import { setAnnotationVisibility } from './utils/measurementServiceMappings/utils/visibility.js';
+import registerCustomCornerstoneTools from './registerCustomCornerstoneTools.js';
+import CornerstoneCache from './services/ViewportService/CornerstoneCacheService';
+
 const Component = React.lazy(() => {
   return import(/* webpackPrefetch: true */ './Viewport/OHIFCornerstoneViewport');
 });
@@ -41,6 +55,13 @@ const OHIFCornerstoneViewport = props => {
       <Component {...props} />
     </React.Suspense>
   );
+};
+
+const registerCacheService = {
+  name: 'cornerstoneCacheService',
+  create: () => {
+    return CornerstoneCache;
+  },
 };
 
 /**
@@ -134,7 +155,21 @@ const cornerstoneExtension: Types.Extensions.Extension = {
     ];
   },
 };
+// TODO update upstream. It seems there is a new way of exporting modules.
+const extensionUtils = {
+  getSOPInstanceAttributes,
+  getEnabledElement,
+  annotation: {
+    setAnnotationColor,
+    setAnnotationLineDash,
+    getAnnotationColor,
+    setAnnotationSelected,
+    setAnnotationVisibility,
+    isAnnotationSelected,
+  },
+};
 
+export { registerCustomCornerstoneTools, extensionUtils };
 export type { PublicViewportOptions };
 export {
   measurementMappingUtils,

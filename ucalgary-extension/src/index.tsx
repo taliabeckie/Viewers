@@ -1,4 +1,10 @@
+import configureTools from './configureTools';
+import getContextModule from './getContextModule';
+import getPanelModule from './getPanelModule';
 import { id } from './id';
+import commandsModule from './modules/commandsModule';
+import registerListenerForAutomaticSRLoad from './registerListenerForAutomaticSRLoad';
+import ExternalAlgorithmService from './services/ExternalAlgorithmService';
 
 /**
  * You can remove any of the following modules if you don't need them.
@@ -16,7 +22,11 @@ export default {
    * (e.g. cornerstone, cornerstoneTools, ...) or registering any services that
    * this extension is providing.
    */
-  preRegistration: ({ servicesManager, commandsManager, configuration = {} }) => {},
+  preRegistration: ({ servicesManager, commandsManager, configuration = {} }) => {
+    servicesManager.registerService(ExternalAlgorithmService);
+    configureTools();
+    registerListenerForAutomaticSRLoad({ commandsManager });
+  },
   /**
    * PanelModule should provide a list of panels that will be available in OHIF
    * for Modes to consume and render. Each panel is defined by a {name,
@@ -69,7 +79,16 @@ export default {
    * object of functions, definitions is an object of available commands, their
    * options, and defaultContext is the default context for the command to run against.
    */
-  getCommandsModule: ({ servicesManager, commandsManager, extensionManager }) => {},
+  /**
+   * Register the commands module to handle the custom External Algorithm setup.
+   */
+  getCommandsModule: ({ servicesManager, commandsManager, extensionManager }) => {
+    return commandsModule({
+      servicesManager,
+      commandsManager,
+      extensionManager,
+    });
+  },
   /**
    * ContextModule should provide a list of context that will be available in OHIF
    * and will be provided to the Modes. A context is a state that is shared OHIF.

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-
 import Icon from '../Icon';
 
 function MeasurementActionIcon({ iconName, onClick, visible }) {
@@ -68,11 +67,11 @@ const MeasurementItem = ({
   };
 
   const actionIcons = [
-    {
-      iconName: visible ? 'eye-visible' : 'eye-hidden',
-      onClick: onChangeVisibilityHandler,
-      visible: isActive || isHovering,
-    },
+    // {
+    //   iconName: visible ? 'eye-visible' : 'eye-hidden',
+    //   onClick: onChangeVisibilityHandler,
+    //   visible: isActive || isHovering,
+    // },
     {
       iconName: 'pencil',
       onClick: onEditHandler,
@@ -140,9 +139,13 @@ MeasurementItem.propTypes = {
   index: PropTypes.number.isRequired,
   label: PropTypes.string,
   displayText: PropTypes.array.isRequired,
+  color: PropTypes.string,
   isActive: PropTypes.bool,
+  visible: PropTypes.bool,
   onClick: PropTypes.func,
   onEdit: PropTypes.func,
+  onChangeVisibility: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 MeasurementItem.defaultProps = {

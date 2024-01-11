@@ -43,13 +43,13 @@ const MeasurementTable = ({
       <div className="bg-secondary-main flex justify-between px-2 py-1">
         <span className="text-base font-bold uppercase tracking-widest text-white">{t(title)}</span>
 
-        {data.length !== 0 && (
+        {/* {data.length !== 0 && (
           <Icon
             className={'ml-auto mr-6 w-4 cursor-pointer text-white'}
             name={hasAnyVisible(data) ? 'eye-visible' : 'eye-hidden'}
             onClick={onChangeVisibility}
           />
-        )}
+        )} */}
         <span className="text-base font-bold text-white">{amount}</span>
       </div>
       <div className="ohif-scrollbar max-h-112 overflow-hidden">

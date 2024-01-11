@@ -6,7 +6,7 @@ import { onCompletedCalibrationLine } from './tools/CalibrationLineTool';
 
 import measurementServiceMappingsFactory from './utils/measurementServiceMappings/measurementServiceMappingsFactory';
 import getSOPInstanceAttributes from './utils/measurementServiceMappings/utils/getSOPInstanceAttributes';
-import Fiducial from '../../../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
+//import Fiducial from '../../../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
 
 const { removeAnnotation } = annotation.state;
 
@@ -31,7 +31,7 @@ const initMeasurementService = (
     CobbAngle,
     RectangleROI,
     PlanarFreehandROI,
-//    Fiducial,
+    ...customTools
   } = measurementServiceMappingsFactory(
     measurementService,
     displaySetService,
@@ -133,7 +133,20 @@ const initMeasurementService = (
     Length.toMeasurement
   );
 
+  // add any existing custom tools
+  Object.keys(customTools).forEach(key => {
+    const CustomTool = customTools[key];
 
+    if (CustomTool) {
+      measurementService.addMapping(
+        csTools3DVer1MeasurementSource,
+        key,
+        CustomTool.matchingCriteria,
+        CustomTool.toAnnotation,
+        CustomTool.toMeasurement
+      );
+    }
+  });
 
   return csTools3DVer1MeasurementSource;
 };
@@ -214,6 +227,31 @@ const connectToolsToMeasurementService = servicesManager => {
       console.warn('Failed to update measurement:', error);
     }
   }
+
+  function changeSelectionProperty(sourceUIDs, newValue, evtDetail) {
+    if (sourceUIDs.length > 1) {
+      console.warn('There are more than one selected, it might cause weird ux flows');
+    }
+
+    sourceUIDs.forEach(uid => {
+      const measurement = measurementService.getMeasurement(uid);
+
+      if (!measurement) {
+        console.log(`Measurement were not tracked by service:: ${uid}`);
+        return;
+      }
+
+      measurement.active = newValue;
+      const sourceAnnotation = annotation.state.getAnnotation(uid);
+      const sourceAnnotationEvent = {
+        ...evtDetail,
+        uid,
+        annotation: sourceAnnotation,
+      };
+      annotationToMeasurement(measurement.toolName, sourceAnnotationEvent);
+    });
+  }
+
   function selectMeasurement(csToolsEvent) {
     try {
       const annotationSelectionEventDetail = csToolsEvent.detail;
@@ -295,6 +333,8 @@ const connectMeasurementServiceToTools = (
     CORNERSTONE_3D_TOOLS_SOURCE_VERSION
   );
 
+  // const { measurementToAnnotation } = csTools3DVer1MeasurementSource;
+
   measurementService.subscribe(MEASUREMENTS_CLEARED, ({ measurements }) => {
     if (!Object.keys(measurements).length) {
       return;
@@ -331,6 +371,9 @@ const connectMeasurementServiceToTools = (
       if (!data) {
         return;
       }
+
+      const annotationType = measurement.metadata.toolName;
+      //   measurementToAnnotation(annotationType, measurement);
 
       if (data.label !== label) {
         data.label = label;
