@@ -245,9 +245,35 @@ export default function PanelMeasurementTable({
     setInputValue2(value);
   };
 
-  //const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);  //ADD LATER - NEEDS EXTERNAL ALGO
+  const handleCheckMarkClick = () => {
+    // Handle checkmark click event
+    setIsCheckMarkSelected(!isCheckMarkSelected);
+    setIsEditSelected(false);
+  };
+  const handleCheckMarkClick2 = () => {
+    // Handle checkmark click event
+    setIsCheckMarkSelected2(true);
+    setIsEditSelected2(false);
+  };
+
+  const handleEditClick = () => {
+    // Handle edit click
+    setIsEditSelected(true); //disable the edit icon and enable Input editing
+    setIsCheckMarkSelected(false);
+  };
+  const handleEditClick2 = () => {
+    // Handle edit click
+    setIsEditSelected2(true); //disable the edit icon and enable Input editing
+    setIsCheckMarkSelected2(false);
+  };
+
+  //const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);
   const [inputValue, setInputValue] = useState(''); //PHASELABELBUTTON TB
   const [inputValue2, setInputValue2] = useState(''); //PHASELABELBUTTON TB
+  const [isCheckMarkSelected, setIsCheckMarkSelected] = useState(false);
+  const [isCheckMarkSelected2, setIsCheckMarkSelected2] = useState(false);
+  const [isEditSelected, setIsEditSelected] = useState(false);
+  const [isEditSelected2, setIsEditSelected2] = useState(false);
 
   return (
     <>
@@ -272,6 +298,7 @@ export default function PanelMeasurementTable({
 
       <div>
         <Label
+          autofocus
           children="End-Diastole:"
           color="hoverless"
           size="small"
@@ -279,6 +306,7 @@ export default function PanelMeasurementTable({
           variant="text"
           fullWidth={false}
         />
+
         <input
           type="text"
           id="integerInput"
@@ -288,9 +316,52 @@ export default function PanelMeasurementTable({
           min={0}
           autoFocus={true}
           size={6}
+          disabled={inputValue !== '' && isCheckMarkSelected}
+          style={{
+            height: '18px',
+            borderRadius: '3px',
+            fontFamily: 'sans-serif',
+            width: '40px',
+            fontSize: '13px',
+            fontWeight: '400',
+            textAlign: 'center',
+            color: '#6fbde2',
+          }}
         />
+        <span
+          role="img"
+          aria-label="Checkmark"
+          onClick={handleCheckMarkClick}
+          style={{
+            cursor: 'pointer',
+            fontSize: '12px',
+            marginLeft: '8px',
+            visibility: inputValue !== '' && !isCheckMarkSelected ? 'visible' : 'hidden',
+            color: '#6fbde2',
+          }}
+        >
+          &#x2713;
+        </span>
+        {/* Edit symbol (pencil) - Visible when checkmark disappears */}
+        {inputValue !== '' && isCheckMarkSelected && (
+          <span
+            role="img"
+            aria-label="Edit"
+            onClick={handleEditClick}
+            style={{
+              cursor: 'pointer',
+              fontSize: '13px',
+              marginLeft: '0px',
+              visibility: isCheckMarkSelected && !isEditSelected ? 'visible' : 'hidden',
+              color: '#6fbde2',
+            }}
+          >
+            &#x270E;
+          </span>
+        )}
 
         <Label
+          autofocus
           children="End-Systole:"
           color="hoverless"
           disabled={true}
@@ -299,7 +370,7 @@ export default function PanelMeasurementTable({
           variant="text"
           fullWidth={false}
         />
-        <input
+        <input //add ability to disable entries
           type="text"
           id="integerInput"
           value={inputValue2}
@@ -308,7 +379,50 @@ export default function PanelMeasurementTable({
           min={0}
           autoFocus={true}
           size={6}
+          disabled={isEditSelected2 ? false : inputValue2 !== '' && isCheckMarkSelected2}
+          style={{
+            height: '18px',
+            borderRadius: '3px',
+            fontFamily: 'sans-serif',
+            width: '40px',
+            fontSize: '13px',
+            fontWeight: '400',
+            textAlign: 'center',
+            color: '#6fbde2',
+          }}
         />
+        <span
+          role="img"
+          aria-label="Checkmark"
+          onClick={handleCheckMarkClick2}
+          style={{
+            cursor: 'pointer',
+            fontSize: '13px',
+            marginLeft: '8px',
+            visibility: inputValue2 !== '' && !isCheckMarkSelected2 ? 'visible' : 'hidden',
+            color: '#6fbde2',
+          }}
+        >
+          &#x2713;
+        </span>
+
+        {/* Edit symbol (pencil) - Visible when checkmark disappears */}
+        {inputValue2 !== '' && isCheckMarkSelected2 && (
+          <span
+            role="img"
+            aria-label="Edit"
+            onClick={handleEditClick2}
+            style={{
+              cursor: 'pointer',
+              fontSize: '12px',
+              marginLeft: '0px',
+              visibility: isCheckMarkSelected2 && !isEditSelected2 ? 'visible' : 'hidden',
+              color: '#6fbde2',
+            }}
+          >
+            &#x270E;
+          </span>
+        )}
       </div>
 
       <div className="flex justify-center p-4">
