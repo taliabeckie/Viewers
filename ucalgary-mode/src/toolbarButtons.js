@@ -1,5 +1,3 @@
-// TODO: torn, can either bake this here; or have to create a whole new button type
-// Only ways that you can pass in a custom React component for render :l
 import {
   // ExpandableToolbarButton,
   // ListMenu,
@@ -292,19 +290,19 @@ const toolbarButtons = [
     props: {
       isRadio: true, // ?
       groupId: 'MoreTools',
-      primary: _createActionButton(
-        'Reset',
-        'tool-reset',
-        'Reset View',
+      primary: _createToggleButton(
+        'cine',
+        'tool-cine',
+        'Cine',
         [
           {
-            commandName: 'resetViewport',
-            commandOptions: {},
+            commandName: 'toggleCine',
             context: 'CORNERSTONE',
           },
         ],
-        'Reset'
+        'Cine'
       ),
+
       secondary: {
         icon: 'chevron-down',
         label: '',
@@ -312,19 +310,6 @@ const toolbarButtons = [
         tooltip: 'More Tools',
       },
       items: [
-        _createActionButton(
-          'Reset',
-          'tool-reset',
-          'Reset View',
-          [
-            {
-              commandName: 'resetViewport',
-              commandOptions: {},
-              context: 'CORNERSTONE',
-            },
-          ],
-          'Reset'
-        ),
         _createActionButton(
           'rotate-right',
           'tool-rotate-right',
@@ -394,16 +379,70 @@ const toolbarButtons = [
           ],
           'Calibration Line'
         ),
-      ],
-    },
-  },
 
-  {
-    id: 'Cine',
-    type: 'ohif.action',
-    component: ToolbarCinePlayer,
-    props: {
-      label: 'Cine',
+        _createActionButton(
+          'TagBrowser',
+          'list-bullets',
+          'Dicom Tag Browser',
+          [
+            {
+              commandName: 'openDICOMTagViewer',
+              commandOptions: {},
+              context: 'DEFAULT',
+            },
+          ],
+          'Dicom Tag Browser'
+        ),
+
+        _createToolButton(
+          'Magnify',
+          'tool-magnify',
+          'Magnify',
+          [
+            {
+              commandName: 'setToolActive',
+              commandOptions: {
+                toolName: 'Magnify',
+              },
+              context: 'CORNERSTONE',
+            },
+          ],
+          'Magnify'
+        ),
+
+        _createActionButton(
+          'Reset',
+          'tool-reset',
+          'Reset View',
+          [
+            {
+              commandName: 'resetViewport',
+              commandOptions: {},
+              context: 'CORNERSTONE',
+            },
+          ],
+          'Reset'
+        ),
+        // _createToggleButton('StackImageSync', 'link', 'Stack Image Sync', [
+        //   {
+        //     commandName: 'toggleStackImageSync',
+        //     commandOptions: {},
+        //     context: 'CORNERSTONE',
+        //   },
+        // ]),
+        // _createToggleButton(
+        //   'ReferenceLines',
+        //   'tool-referenceLines', // change this with the new icon
+        //   'Reference Lines',
+        //   [
+        //     {
+        //       commandName: 'toggleReferenceLines',
+        //       commandOptions: {},
+        //       context: 'CORNERSTONE',
+        //     },
+        //   ]
+        // ),
+      ],
     },
   },
 ];
