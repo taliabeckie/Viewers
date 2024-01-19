@@ -69,17 +69,55 @@ const defaultContextMenu = {
           ],
         },
 
-        {
-          label: 'Aorta desc',
-          commands: [
-            {
-              commandName: 'labelLAortadesc',
-            },
-          ],
-        },
+        // {
+        //   label: 'Aorta desc',
+        //   commands: [
+        //     {
+        //       commandName: 'labelLAortadesc',
+        //     },
+        //   ],
+        // },
 
         {
           label: 'Custom label',
+          commands: [
+            {
+              commandName: 'setMeasurementLabel',
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      id: 'foremptyviewport',
+      items: [
+        {
+          label: 'SAX',
+          commands: [
+            {
+              commandName: 'setMeasurementLabel',
+            },
+          ],
+        },
+        {
+          label: '4-Chamber',
+          commands: [
+            {
+              commandName: 'setMeasurementLabel',
+            },
+          ],
+        },
+        {
+          label: '3-Chamber',
+          commands: [
+            {
+              commandName: 'setMeasurementLabel',
+            },
+          ],
+        },
+        {
+          label: '2-Chamber',
           commands: [
             {
               commandName: 'setMeasurementLabel',
