@@ -105,11 +105,7 @@ function getCustomCornerstoneTools() {
  */
 function registerCustomTools(tools = []) {
   tools.forEach(toolItem => {
-    let result = addCustomTool(
-      toolItem.CustomTool,
-      toolItem.toolName,
-      toolItem.cursor
-    );
+    let result = addCustomTool(toolItem.CustomTool, toolItem.toolName, toolItem.cursor);
 
     if (result) {
       result = registerCustomToolsMappingFactory(
@@ -119,10 +115,8 @@ function registerCustomTools(tools = []) {
     }
 
     if (!result) {
-      customToolCache.revertFromCache(toolItem.CustomTool);
-      console.warn(
-        `Custom tool: ${toolItem.CustomTool.toolName} failed to be registered`
-      );
+      customToolCache.revertFromCache();
+      console.warn(`Custom tool: ${toolItem.CustomTool.toolName} failed to be registered`);
     }
   });
 }

@@ -44,6 +44,7 @@ import {
 import { setAnnotationVisibility } from './utils/measurementServiceMappings/utils/visibility.js';
 import registerCustomCornerstoneTools from './registerCustomCornerstoneTools.js';
 import CornerstoneCache from './services/ViewportService/CornerstoneCacheService';
+import configureTools from '../../../ucalgary-extension/src/configureTools';
 
 const Component = React.lazy(() => {
   return import(/* webpackPrefetch: true */ './Viewport/OHIFCornerstoneViewport');
@@ -96,7 +97,7 @@ const cornerstoneExtension: Types.Extensions.Extension = {
     servicesManager.registerService(SyncGroupService.REGISTRATION);
     servicesManager.registerService(SegmentationService.REGISTRATION);
     servicesManager.registerService(CornerstoneCacheService.REGISTRATION);
-
+    configureTools();
     return init.call(this, props);
   },
 
@@ -137,6 +138,7 @@ const cornerstoneExtension: Types.Extensions.Extension = {
           },
           getEnabledElement,
           dicomLoaderService,
+          //registerColorMap present in V2
         },
       },
       {
@@ -169,7 +171,6 @@ const extensionUtils = {
   },
 };
 
-export { registerCustomCornerstoneTools, extensionUtils };
 export type { PublicViewportOptions };
 export {
   measurementMappingUtils,
@@ -178,4 +179,5 @@ export {
   getActiveViewportEnabledElement,
   ImageOverlayViewerTool,
 };
+export { registerCustomCornerstoneTools, extensionUtils };
 export default cornerstoneExtension;
