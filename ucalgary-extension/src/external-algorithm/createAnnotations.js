@@ -1,7 +1,6 @@
 import { metaData, utilities } from '@cornerstonejs/core';
 import { PlanarFreehandROITool } from '@cornerstonejs/tools';
 import { FIDUCIAL_TOOL_NAME } from '../tools/FiducialTool';
-
 const PLANAR_FREEHAND_ROI_TOOL_NAME = PlanarFreehandROITool.toolName;
 
 const { worldToImageCoords } = utilities;

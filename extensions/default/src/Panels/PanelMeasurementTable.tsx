@@ -133,7 +133,21 @@ export default function PanelMeasurementTable({
         );
       };
 
-      return createReportAsync({ servicesManager, getReport });
+      const storeAPI = async () => {
+        console.log('storeAPI is accessed');
+        return commandsManager.runCommand('initiateExternalAlgorithm', {
+          name: 'Store Results to backend API',
+          endpointName: 'StoreReport',
+          algorithm: {
+            algorithmName: 'StoreReport',
+            version: '0.0.1',
+          },
+          seriesInstanceUID: 'test', //SeriesInstanceUID,
+          sopInstanceUID: 'test', //SOPInstanceUID,
+        });
+      };
+
+      return createReportAsync({ servicesManager, getReport, storeAPI });
     }
   }
 
