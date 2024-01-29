@@ -7,7 +7,9 @@ import ActionButtons from './ActionButtons';
 import debounce from 'lodash.debounce';
 import ConfigPoint from 'config-point';
 import Label from '../../../../platform/ui/src/components/Label/Label';
-import { useExternalAlgorithm } from '../contexts';
+import { useExternalAlgorithm } from '../../../../ucalgary-extension/src/contexts/ExternalAlgorithmContext';
+import ResultChart from '../../../../ucalgary-extension/src/external-algorithm/resultChart/ResultChart';
+import ResultReportItem from '../../../../ucalgary-extension/src/external-algorithm/ResultReport/ResultReportItem';
 
 import createReportDialogPrompt, {
   CREATE_REPORT_DIALOG_RESPONSE,
@@ -41,6 +43,10 @@ export default function PanelMeasurementTable({
     servicesManager as ServicesManager
   ).services;
   const [displayMeasurements, setDisplayMeasurements] = useState([]);
+
+  const externalAlgorithmResult = useExternalAlgorithm();
+  const reports = externalAlgorithmResult.reports || [];
+  const reportsSortInfo = externalAlgorithmResult.sortInfo || {};
 
   useEffect(() => {
     const debouncedSetDisplayMeasurements = debounce(setDisplayMeasurements, 100);
@@ -134,8 +140,9 @@ export default function PanelMeasurementTable({
       };
 
       const storeAPI = async () => {
-        console.log('storeAPI is accessed');
+        //console.log('storeAPI is accessed');
         return commandsManager.runCommand('initiateExternalAlgorithm', {
+          //needs to be added to this commandsManager
           name: 'Store Results to backend API',
           endpointName: 'StoreReport',
           algorithm: {
@@ -144,12 +151,22 @@ export default function PanelMeasurementTable({
           },
           seriesInstanceUID: 'test', //SeriesInstanceUID,
           sopInstanceUID: 'test', //SOPInstanceUID,
+          inputValue,
+          inputValue2,
         });
       };
 
       return createReportAsync({ servicesManager, getReport, storeAPI });
     }
   }
+
+  const startRunExternalAlgorithm = () => {
+    return commandsManager.runCommand('runExternalAlgorithm', {
+      name: 'Generate Contours',
+      endpointName: 'GenerateContours',
+      algorithm: { algorithmName: 'GenerateContours', version: '0.0.1' },
+    });
+  };
 
   const jumpToImage = ({ uid, isActive }) => {
     measurementService.jumpToMeasurement(viewportGrid.activeViewportId, uid);
@@ -247,7 +264,6 @@ export default function PanelMeasurementTable({
     });
   };
 
-  //PHASELABEL TB
   const handleInputChange = e => {
     // Ensure that the input only allows integers
     const value = e.target.value.replace(/[^0-9]/g, '');
@@ -281,7 +297,7 @@ export default function PanelMeasurementTable({
     setIsCheckMarkSelected2(false);
   };
 
-  //const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);
+  const aiResultsProps = _mapReportToDisplay(reports, reportsSortInfo);
   const [inputValue, setInputValue] = useState(''); //PHASELABELBUTTON TB
   const [inputValue2, setInputValue2] = useState(''); //PHASELABELBUTTON TB
   const [isCheckMarkSelected, setIsCheckMarkSelected] = useState(false);
@@ -292,7 +308,10 @@ export default function PanelMeasurementTable({
   return (
     <>
       <div
-        className="ohif-scrollbar overflow-y-auto overflow-x-hidden"
+        //className="ohif-scrollbar overflow-y-auto overflow-x-hidden"
+        className={`${
+          aiResultsProps?.items?.length ? 'flex-grow ' : ''
+        }overflow-x-hidden invisible-scrollbar overflow-y-auto`}
         data-cy={'measurements-panel'}
       >
         <MeasurementTable
@@ -441,11 +460,28 @@ export default function PanelMeasurementTable({
 
       <div className="flex justify-center p-4">
         <ActionButtons
-          onExportClick={exportReport}
+          // onExportClick={exportReport}
+          onRunAlgorithmClick={startRunExternalAlgorithm}
           onClearMeasurementsClick={clearMeasurements}
           onCreateReportClick={createReport}
         />
       </div>
+
+      {(aiResultsProps?.items?.length || aiResultsProps?.reportInfos?.length) && (
+        <div className="text-primary-light flex flex-grow-0 justify-center p-2 uppercase">
+          Results
+        </div>
+      )}
+      {aiResultsProps?.items?.length && (
+        <div className="invisible-scrollbar flex-grow overflow-y-auto overflow-x-hidden">
+          <ResultChart {...aiResultsProps}></ResultChart>
+        </div>
+      )}
+      {aiResultsProps?.reportInfos?.length && (
+        <div className="flex-grow-0">
+          <ResultReportItem {...aiResultsProps}></ResultReportItem>
+        </div>
+      )}
     </>
   );
 }

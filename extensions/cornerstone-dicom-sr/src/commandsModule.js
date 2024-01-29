@@ -1,18 +1,25 @@
+import React from 'react';
 import { metaData, utilities } from '@cornerstonejs/core';
-
 import OHIF, { DicomMetadataStore } from '@ohif/core';
 import dcmjs from 'dcmjs';
 import { adaptersSR } from '@cornerstonejs/adapters';
-
+import ProgressBar from '../../../ucalgary-extension/src/external-algorithm/ProgressBar';
 import getFilteredCornerstoneToolState from './utils/getFilteredCornerstoneToolState';
-
+import _viewportToSelection from '../../../ucalgary-extension/src/external-algorithm/viewportToSelection';
+import _mapToSimpleSelection from '../../../ucalgary-extension/src/external-algorithm/mapToSimpleSelection';
+import _getAllViewports from '../../../ucalgary-extension/src/utils/getAllViewports';
 import { _getViewport } from '../../../ucalgary-extension/src/utils/getViewport';
+import _getViewportEnabledElement from '../../../ucalgary-extension/src/utils/getViewportEnabledElement';
 import { FIDUCIAL_TOOL_NAME } from '../../../ucalgary-extension/src/tools/FiducialTool';
 import ConfigPoint from 'config-point';
 import { addMeasurements } from '../../../ucalgary-extension/src/utils/adapters';
 import _createAnnotations from '../../../ucalgary-extension/src/external-algorithm/createAnnotations';
 import { PlanarFreehandROITool } from '@cornerstonejs/tools';
-
+import { once } from 'lodash';
+import { Dialog } from '@ohif/ui';
+import { importAnnotationsFromAIPrediction } from '../../../ucalgary-extension/src/utils/aiBackendIO';
+import { readSR } from '../../../ucalgary-extension/src/utils/importSR';
+import setExternalAlgorithmResult from '../../../ucalgary-extension/src/contexts/ExternalAlgorithmContext';
 const PLANAR_FREEHAND_ROI_TOOL_NAME = PlanarFreehandROITool.toolName;
 const { MeasurementReport } = adaptersSR.Cornerstone3D;
 const { log } = OHIF;
@@ -49,7 +56,24 @@ const _generateReport = (measurementData, additionalFindingTypes, options = {}) 
 
 const commandsModule = props => {
   const { servicesManager, extensionManager, commandsManager } = props;
-  const { customizationService, UIDialogService, UINotificationService } = servicesManager.services;
+  const { customizationService, UIDialogService, UINotificationService, ViewportGridService } =
+    servicesManager.services;
+
+  //const { apiEndpoints } = ConfigPoint.getConfig('contextMenus');
+  //console.log('External API endpoints: ', apiEndpoints);
+  const apiEndpoints = {
+    GenerateContours: 'https://api.davincitech.ca/api/generate-contours/',
+    APIPrediction: 'https://api.davincitech.ca/api/run-ai-prediction/',
+    StoreReport: 'https://api.davincitech.ca/api/workspace-state/',
+    ErrorTest: 'http://localhost:5000/dicomweb/api/ai-error',
+    ImmediateReturn: 'http://localhost:5000/dicomweb/api/immediate-return',
+  }
+  console.log('External API endpoints: ', apiEndpoints);
+
+  const _getActiveViewportEnabledElement = () => {
+    const { activeViewportIndex } = ViewportGridService.getState();
+    return _getViewportEnabledElement(activeViewportIndex);
+  };
 
   const _showFailedNotification = (runProps, message, statusCode) => {
     const { name } = runProps;
@@ -315,6 +339,42 @@ const commandsModule = props => {
       return results;
     },
 
+    runExternalAlgorithm: runProps => {
+      const { items = [] } = runProps;
+      if (!UIDialogService) {
+        return;
+      }
+      console.log('Running External Algorithm');
+      const onSubmitHandler = ({ action }) => {
+        UIDialogService.dismiss({ id: dialogId });
+      };
+
+      const onSelectHandler = ({ item }) => {
+        UIDialogService.dismiss({ id: dialogId });
+        commandsManager.runCommand(item.commandName, item.commandOptions);
+      };
+
+      // Show the dialog
+      const dialogId = 'RunExternalAlgorithm';
+      UIDialogService.create({
+        id: dialogId,
+        centralize: true,
+        isDraggable: true,
+        showOverlay: true,
+        content: Dialog,
+        onClose: () => UIDialogService.dismiss({ id: dialogId }),
+        contentProps: {
+          title: 'Run External Algorithm',
+          onClose: () => UIDialogService.dismiss({ id: dialogId }),
+          // body: () => bodyList(items, onSelectHandler),
+          actions: [{ id: 'cancel', text: 'Cancel', type: 'primary' }],
+          onSubmit: onSubmitHandler,
+        },
+      });
+
+      // On ok, complete the External Algorithm
+    },
+
     initiateExternalAlgorithm: runProps => {
       const {
         algorithm,
@@ -326,12 +386,7 @@ const commandsModule = props => {
         inputValue2,
       } = runProps;
       console.log('External Algorithm initiate', name);
-
-      //const { apiEndpoints } = ConfigPoint.getConfig('contextMenus');
-      //console.log('External API endpoints: ', apiEndpoints);
-      //const endpointUrl = apiEndpoints[endpointName];
-
-      const endpointUrl = ''; //for now
+      const endpointUrl = apiEndpoints[endpointName];
 
       const selection = getSelection();
       const annotations = _createAnnotations({ servicesManager });
@@ -373,10 +428,10 @@ const commandsModule = props => {
               });
               job = results;
               const { jobId = xhr.responseText } = job;
-              // commandsManager.runCommand('progressExternalAlgorithm', {
-              //   ...runProps,
-              //   jobId,
-              // });
+              commandsManager.runCommand('progressExternalAlgorithm', {
+                ...runProps,
+                jobId,
+              });
               break;
             default:
               _showFailedNotification(runProps, 'Unable to invoke', xhr.status);
@@ -386,6 +441,237 @@ const commandsModule = props => {
       xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
       xhr.send(JSON.stringify(message));
     },
+
+    getSelection: () => {
+      const activeViewport = _getActiveViewportEnabledElement();
+      const allViewports = _getAllViewports();
+      const mainSelection = _viewportToSelection(activeViewport);
+
+      const selection = allViewports.map(selectionItem =>
+        _mapToSimpleSelection(selectionItem, ['OHIF:InView'])
+      );
+      selection
+        .filter(selectionItem => selectionItem.imageId === mainSelection.imageId)
+        .forEach(selectionItem => {
+          selectionItem.selectionCodes.push('OHIF:Current');
+        });
+
+      const mappedSelection = {
+        selectionCodes: ['OHIF:InView'],
+        studyInstanceUID: undefined,
+        series: [],
+      };
+
+      selection.forEach(selectionItem => {
+        const imageId = selectionItem.imageId[0];
+        const generalSeriesModule = metaData.get('generalSeriesModule', imageId);
+
+        const sopCommonModule = metaData.get('sopCommonModule', imageId);
+
+        const { sopInstanceUID } = sopCommonModule;
+        const { seriesInstanceUID, studyInstanceUID } = generalSeriesModule;
+
+        if (mappedSelection.studyInstanceUID === undefined) {
+          mappedSelection.studyInstanceUID = studyInstanceUID;
+        }
+
+        let seriesSelection = mappedSelection.series.find(
+          aSeries => aSeries.seriesInstanceUID === seriesInstanceUID
+        );
+
+        if (seriesSelection === undefined) {
+          // Create the seriesSelection entry
+          seriesSelection = {
+            seriesInstanceUID,
+            instances: [],
+          };
+          mappedSelection.series.push(seriesSelection);
+        }
+
+        let instanceSelection = seriesSelection.instances.find(
+          anInstance => anInstance.sopInstanceUID === sopInstanceUID
+        );
+
+        if (instanceSelection === undefined) {
+          // Create the instanceSelection entry
+          instanceSelection = {
+            sopInstanceUID,
+          };
+          seriesSelection.instances.push(instanceSelection);
+        }
+
+        delete selectionItem.imageId;
+      });
+
+      return mappedSelection;
+    },
+
+     /**
+   * Create a progress check dialog, and initiate the value.
+   * @returns
+   */
+  createProgressCheck: runProps => {
+    const { name, jobId, endpointName } = runProps;
+    let completed: any = 0;
+    let statusCode: any = 0;
+
+    const checkStatus = () => {
+      console.log('Starting check status at', new Date());
+      const endpointUrl = apiEndpoints[endpointName];
+      const slashIfNeeded = apiEndpoints[endpointName].endsWith('/') ? '' : '/';
+
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'json';
+      xhr.open('GET', `${endpointUrl}${slashIfNeeded}${jobId}/`, true);
+
+      xhr.onreadystatechange = function() {
+        //Call a function when the state changes.
+        if (xhr.readyState == 4) {
+          statusCode = xhr.status;
+          switch (xhr.status) {
+            case 200:
+              const results = xhr.response;
+              const { job = {} } = results;
+              const { jobStatus = 'FAILED', jobProgress = 0 } = job;
+              if (jobStatus === 'COMPLETE') {
+                console.log('Result is COMPLETE');
+                commandsManager.runCommand('completeExternalAlgorithm', {
+                  ...runProps,
+                  results,
+                });
+                completed = jobStatus;
+              } else if (
+                ['SUBMITTED', 'PROGRESS', 'PROCESSING'].includes(jobStatus)
+              ) {
+                completed = jobProgress;
+                console.log('Setting next timeout, with completed=', completed);
+                setTimeout(checkStatus, 100);
+              } else {
+                console.log('FAILED', jobStatus, jobProgress);
+                completed = 'FAILED';
+              }
+              break;
+            default:
+              completed = 'FAILED';
+          }
+        }
+      };
+      xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      xhr.send();
+    };
+
+    checkStatus();
+
+    return () => ({ jobProgress: completed, statusCode });
+  },
+
+
+  progressExternalAlgorithm: runProps => {
+    const { jobId, results = {}, name } = runProps;
+    const { job = {} } = results;
+    const { jobStatus } = job;
+    console.log('Progress External Algorithm', jobId, results);
+    const onSubmitHandler = () => {
+      UIDialogService.dismiss({ id: dialogId });
+    };
+
+    const onErrorHandler = statusCode => {
+      _showFailedNotification(
+        runProps,
+        `External Algorithm failed for job ${jobId}`,
+        statusCode
+      );
+    };
+
+    const onceOnError = once(onErrorHandler);
+
+    // Show the dialog
+    const dialogId = 'ProgressExternalAlgorithm';
+    const progressCheck = commandsManager.runCommand('createProgressCheck',{
+      runProps
+      });
+
+    UIDialogService.create({
+      id: dialogId,
+      centralize: true,
+      isDraggable: true,
+      showOverlay: true,
+      content: Dialog,
+      onClose: () => UIDialogService.dismiss({ id: dialogId }),
+      contentProps: {
+        title: `Progress ${name} ${jobStatus}`,
+        onClose: () => UIDialogService.dismiss({ id: dialogId }),
+        // body: () => (
+        //   <ProgressBar
+        //     bgcolor="yellow"
+        //     progressCheck={progressCheck}
+        //     onComplete={onSubmitHandler}
+        //     onError={onceOnError}
+        //   />
+        // ),
+        actions: [
+          { id: 'cancel', text: 'Cancel', type: 'primary' },
+          { id: 'ok', text: 'OK', type: 'secondary' },
+        ],
+        onSubmit: onSubmitHandler,
+      },
+    });
+  },
+
+  completeExternalAlgorithm: runProps => {
+    const { results, algorithm } = runProps;
+    const { algorithmName } = algorithm;
+
+    switch (algorithmName) {
+      case 'GenerateContours':
+        console.log('Replace current measurements with contours from', results);
+        commandsManager.runCommand(
+          'importAnnotationsFromAIPrediction',
+          {
+            aiPredictionResult: results,
+          },
+          'CORNERSTONE'
+        );
+        break;
+      case 'DiseasePrediction':
+        console.log('Update Disease prediction result from', results);
+        //ExternalAlgorithmService.setExternalAlgorithmResult(results);   ///////////////
+        setExternalAlgorithmResult(results);
+        break;
+      case 'StoreReport':
+        // do nothing with result.
+        break;
+      default:
+        throw new Error(
+          `No handler for algorithm results for ${algorithmName}`
+        );
+    }
+  },
+
+  importReport: async ({ study, seriesInstanceUid }) => {
+    const measurementByAnnotationType = await readSR(
+      { servicesManager, extensionManager },
+      { study, seriesInstanceUid }
+    );
+
+    if (measurementByAnnotationType) {
+      // If we have found an SR and extracted measurements, add them to
+      // the measurement service.
+      addMeasurements(
+        { commandsManager, extensionManager, servicesManager },
+        measurementByAnnotationType
+      );
+    }
+  },
+
+  importAnnotationsFromAIPrediction: ({ aiPredictionResult }) => {
+    importAnnotationsFromAIPrediction(
+      { commandsManager, servicesManager, extensionManager },
+      aiPredictionResult
+    );
+  },
+
+
   };
 
   const definitions = {
@@ -399,7 +685,6 @@ const commandsModule = props => {
       storeContexts: [],
       options: {},
     },
-
     applyFindingSiteSpecificAnnotationProperties: {
       commandFn: actions.applyFindingSiteSpecificAnnotationProperties,
       storeContexts: [],
@@ -410,28 +695,18 @@ const commandsModule = props => {
     //   storeContexts: [],
     //   options: {},
     // },
-    // importReport: {
-    //   commandFn: actions.importReport,
-    //   storeContexts: [],
-    //   options: {},
-    // },
-    // importAnnotationsFromAIPrediction: {
-    //   commandFn: actions.importAnnotationsFromAIPrediction,
-    //   storeContexts: [],
-    //   options: {},
-    // },
     getToolDataActiveCanvasPoints: {
       commandFn: actions.getToolDataActiveCanvasPoints,
       storeContexts: [],
       options: {},
     },
-    // openCreateReportDialog: {
-    //   commandFn: actions.openCreateReportDialog,
-    //   storeContexts: [],
-    //   options: {},
-    // },
     getContextMenuCustomActions: {
       commandFn: actions.getContextMenuCustomActions,
+      storeContexts: [],
+      options: {},
+    },
+    runExternalAlgorithm: {
+      commandFn: actions.runExternalAlgorithm,
       storeContexts: [],
       options: {},
     },
@@ -442,6 +717,36 @@ const commandsModule = props => {
     },
     getJSONResults: {
       commandFn: actions.getJSONResults,
+      storeContexts: [],
+      options: {},
+    },
+    getSelection: {
+      commandFn: actions.getSelection,
+      storeContexts: [],
+      options: {},
+    },
+    createProgressCheck:{
+      commandFn: actions.createProgressCheck,
+      storeContexts: [],
+      options: {},
+    },
+    progressExternalAlgorithm:{
+      commandFn: actions.progressExternalAlgorithm,
+      storeContexts: [],
+      options: {},
+    },
+    completeExternalAlgorithm:{
+      commandFn: actions.completeExternalAlgorithm,
+      storeContexts: [],
+      options: {},
+    },
+    importReport: {
+      commandFn: actions.importReport,
+      storeContexts: [],
+      options: {},
+    },
+    importAnnotationsFromAIPrediction: {
+      commandFn: actions.importAnnotationsFromAIPrediction,
       storeContexts: [],
       options: {},
     },
