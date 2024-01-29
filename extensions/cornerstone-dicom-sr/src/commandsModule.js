@@ -11,7 +11,9 @@ import { FIDUCIAL_TOOL_NAME } from '../../../ucalgary-extension/src/tools/Fiduci
 import ConfigPoint from 'config-point';
 import { addMeasurements } from '../../../ucalgary-extension/src/utils/adapters';
 import _createAnnotations from '../../../ucalgary-extension/src/external-algorithm/createAnnotations';
+import { PlanarFreehandROITool } from '@cornerstonejs/tools';
 
+const PLANAR_FREEHAND_ROI_TOOL_NAME = PlanarFreehandROITool.toolName;
 const { MeasurementReport } = adaptersSR.Cornerstone3D;
 const { log } = OHIF;
 /**
@@ -47,7 +49,16 @@ const _generateReport = (measurementData, additionalFindingTypes, options = {}) 
 
 const commandsModule = props => {
   const { servicesManager, extensionManager, commandsManager } = props;
-  const { customizationService, UIDialogService } = servicesManager.services;
+  const { customizationService, UIDialogService, UINotificationService } = servicesManager.services;
+
+  const _showFailedNotification = (runProps, message, statusCode) => {
+    const { name } = runProps;
+    UINotificationService.show({
+      title: `${name} Failed`,
+      message: `${message} - status: ${statusCode}`,
+      type: 'error',
+    });
+  };
 
   const actions = {
     /**
@@ -150,12 +161,12 @@ const commandsModule = props => {
       }
 
       switch (toolName) {
-        // case PLANAR_FREEHAND_ROI_TOOL_NAME:
-        //   const { joinedOpenContour } = codingValue;
+        case PLANAR_FREEHAND_ROI_TOOL_NAME:
+          const { joinedOpenContour } = codingValue;
 
-        //   data.isOpenUShapeContour = !!joinedOpenContour;
+          data.isOpenUShapeContour = !!joinedOpenContour;
 
-        //   break;
+          break;
         case FIDUCIAL_TOOL_NAME:
           //seriesLabel
           const { seriesLabel } = codingValue;
@@ -185,14 +196,14 @@ const commandsModule = props => {
 
       let worldPoints;
 
-      // switch (metadata?.toolName) {
-      //   case PLANAR_FREEHAND_ROI_TOOL_NAME:
-      //     worldPoints = data?.polyline;
-      //     break;
-      //   default:
-      //     worldPoints = data?.handles?.points;
-      //     break;
-      // }
+      switch (metadata?.toolName) {
+        case PLANAR_FREEHAND_ROI_TOOL_NAME:
+          worldPoints = data?.polyline;
+          break;
+        default:
+          worldPoints = data?.handles?.points;
+          break;
+      }
 
       return commandsManager.runCommand('worldPointsToActiveCanvas', {
         worldPoints,
@@ -311,17 +322,19 @@ const commandsModule = props => {
         name,
         seriesInstanceUID = '',
         sopInstanceUID = '',
+        inputValue,
+        inputValue2,
       } = runProps;
       console.log('External Algorithm initiate', name);
 
       //const { apiEndpoints } = ConfigPoint.getConfig('contextMenus');
-      // console.log('External API endpoints: ', apiEndpoints);
-      // const endpointUrl = apiEndpoints[endpointName];
+      //console.log('External API endpoints: ', apiEndpoints);
+      //const endpointUrl = apiEndpoints[endpointName];
+
       const endpointUrl = ''; //for now
 
       const selection = getSelection();
       const annotations = _createAnnotations({ servicesManager });
-      //  const annotations = '';
 
       const structuredReport = {
         label: 'alg1-sr',
@@ -329,10 +342,17 @@ const commandsModule = props => {
         sopInstanceUID,
         annotations,
       };
+
+      const ed = inputValue;
+      const es = inputValue2;
+
+      const phases = `End-Diastole phase: ${ed}, End-Systole phase: ${es}`;
+
       const message = {
         algorithm,
         selection,
         structuredReport,
+        phases,
       };
       console.log('External Algorithm post data=\n', JSON.stringify(message, null, 2));
 
@@ -359,7 +379,7 @@ const commandsModule = props => {
               // });
               break;
             default:
-            //_showFailedNotification(runProps, 'Unable to invoke', xhr.status);
+              _showFailedNotification(runProps, 'Unable to invoke', xhr.status);
           }
         }
       };
@@ -415,12 +435,6 @@ const commandsModule = props => {
       storeContexts: [],
       options: {},
     },
-    // openLabelPhasesDialogPrompt: {
-    //   commandFn: actions.openLabelPhasesDialogPrompt,
-    //   storeContexts: [],
-    //   options: {},
-    // },
-    // ...mlDefinitions,
     initiateExternalAlgorithm: {
       commandFn: actions.initiateExternalAlgorithm,
       storeContexts: [],
