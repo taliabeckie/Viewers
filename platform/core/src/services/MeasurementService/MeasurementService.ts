@@ -286,6 +286,10 @@ class MeasurementService extends PubSubService {
       return this.annotationToMeasurement(source, annotationType, annotation, isUpdate);
     };
 
+    source.measurementToAnnotation = (annotationType, measurement) => {
+      return this.measurementToAnnotation(source, annotationType, measurement);
+    };
+
     source.remove = (measurementUID, eventDetails) => {
       return this.remove(measurementUID, source, eventDetails);
     };

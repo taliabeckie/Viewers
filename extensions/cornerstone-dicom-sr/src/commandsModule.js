@@ -20,6 +20,7 @@ import { Dialog } from '@ohif/ui';
 import { importAnnotationsFromAIPrediction } from '../../../ucalgary-extension/src/utils/aiBackendIO';
 import { readSR } from '../../../ucalgary-extension/src/utils/importSR';
 import setExternalAlgorithmResult from '../../../ucalgary-extension/src/contexts/ExternalAlgorithmContext';
+
 const PLANAR_FREEHAND_ROI_TOOL_NAME = PlanarFreehandROITool.toolName;
 const { MeasurementReport } = adaptersSR.Cornerstone3D;
 const { log } = OHIF;
@@ -340,7 +341,7 @@ const commandsModule = props => {
     },
 
     runExternalAlgorithm: runProps => {
-      const { items = [] } = runProps;
+      const { items = [], bodyList } = runProps;
       if (!UIDialogService) {
         return;
       }
@@ -366,7 +367,7 @@ const commandsModule = props => {
         contentProps: {
           title: 'Run External Algorithm',
           onClose: () => UIDialogService.dismiss({ id: dialogId }),
-          // body: () => bodyList(items, onSelectHandler),
+          body: () => bodyList(items, onSelectHandler),                      //////////////////////////
           actions: [{ id: 'cancel', text: 'Cancel', type: 'primary' }],
           onSubmit: onSubmitHandler,
         },
@@ -604,7 +605,7 @@ const commandsModule = props => {
         // body: () => (
         //   <ProgressBar
         //     bgcolor="yellow"
-        //     progressCheck={progressCheck}
+        //     progressCheck={progressCheck}                    //////////////////////////////////////
         //     onComplete={onSubmitHandler}
         //     onError={onceOnError}
         //   />
@@ -635,7 +636,7 @@ const commandsModule = props => {
         break;
       case 'DiseasePrediction':
         console.log('Update Disease prediction result from', results);
-        //ExternalAlgorithmService.setExternalAlgorithmResult(results);   ///////////////
+        //ExternalAlgorithmService.setExternalAlgorithmResult(results);
         setExternalAlgorithmResult(results);
         break;
       case 'StoreReport':

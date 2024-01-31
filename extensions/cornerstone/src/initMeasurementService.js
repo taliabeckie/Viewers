@@ -3,10 +3,9 @@ import { Enums, annotation } from '@cornerstonejs/tools';
 import { DicomMetadataStore } from '@ohif/core';
 import { toolNames } from './initCornerstoneTools';
 import { onCompletedCalibrationLine } from './tools/CalibrationLineTool';
-
 import measurementServiceMappingsFactory from './utils/measurementServiceMappings/measurementServiceMappingsFactory';
 import getSOPInstanceAttributes from './utils/measurementServiceMappings/utils/getSOPInstanceAttributes';
-//import Fiducial from '../../../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
+import Fiducial from '../../../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
 
 const { removeAnnotation } = annotation.state;
 
@@ -115,14 +114,6 @@ const initMeasurementService = (
     PlanarFreehandROI.toMeasurement
   );
 
-  // measurementService.addMapping(
-  //   csTools3DVer1MeasurementSource,
-  //   'Fiducial',
-  //   Fiducial.matchingCriteria,
-  //   Fiducial.toAnnotation,
-  //   Fiducial.toMeasurement
-  // );
-
   // On the UI side, the Calibration Line tool will work almost the same as the
   // Length tool
   measurementService.addMapping(
@@ -133,7 +124,7 @@ const initMeasurementService = (
     Length.toMeasurement
   );
 
-  // add any existing custom tools
+  // // add any existing custom tools
   Object.keys(customTools).forEach(key => {
     const CustomTool = customTools[key];
 
@@ -333,7 +324,7 @@ const connectMeasurementServiceToTools = (
     CORNERSTONE_3D_TOOLS_SOURCE_VERSION
   );
 
-  // const { measurementToAnnotation } = csTools3DVer1MeasurementSource;
+  const { measurementToAnnotation } = csTools3DVer1MeasurementSource;
 
   measurementService.subscribe(MEASUREMENTS_CLEARED, ({ measurements }) => {
     if (!Object.keys(measurements).length) {
@@ -373,7 +364,7 @@ const connectMeasurementServiceToTools = (
       }
 
       const annotationType = measurement.metadata.toolName;
-      //   measurementToAnnotation(annotationType, measurement);
+      measurementToAnnotation(annotationType, measurement);
 
       if (data.label !== label) {
         data.label = label;
@@ -412,7 +403,7 @@ const connectMeasurementServiceToTools = (
         imageId = dataSource.getImageIdsForInstance({ instance });
       }
 
-      const annotationManager = annotation.state.getAnnotationManager();
+      const annotationManager = annotation.state.getDefaultAnnotationManager();
       annotationManager.addAnnotation({
         annotationUID: measurement.uid,
         highlighted: false,

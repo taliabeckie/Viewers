@@ -6,7 +6,7 @@ function isColorInvisible(color) {
   return color === '#000000';
 }
 /**
- * It updates a Fiducial annotatimeasuon data by the given measurement service format.
+ * It updates Fiducial annotation data by the given measurement service format.
  * It uses measurement.uid to seek for the related annotation and apply the changes.
  * @typedef {function(Object)} ToAnnotationMethod
  *
@@ -41,8 +41,11 @@ function isColorInvisible(color) {
  */
 const Fiducial = {
   toAnnotation: measurement => {
+    console.log('measurement: ');
+    console.log(measurement);
     const annotationUID = measurement.uid;
     const annotation = csToolsAnnotation.state.getAnnotation(annotationUID);
+    console.log(annotation);
 
     if (!annotation) {
       return;
@@ -51,6 +54,7 @@ const Fiducial = {
     // side effect, cs should provide api to prevent changing by ref.
     annotation.data.label = measurement.label;
     annotation.data.findingSite = measurement.findingSite;
+    console.log(measurement.findingSite);
     annotation.data.finding = measurement.finding;
 
     const invisibleColor =
@@ -65,12 +69,77 @@ const Fiducial = {
 
     let visibility = measurement.visible;
 
+    const codingValues = {
+      id: 'codingValues',
+
+      // Sites
+      // 'SCT:69536005': {
+      //   text: 'Head',
+      //   type: 'site',
+      // },
+      // 'SCT:45048000': {
+      //   text: 'Neck',
+      //   type: 'site',
+      // },
+      // 'SCT:818981001': {
+      //   text: 'Abdomen',
+      //   type: 'site',
+      // },
+      // 'SCT:816092008': {
+      //   text: 'Pelvis',
+      //   type: 'site',
+      // },
+
+      // Findings
+      // 'SCT:371861004': {
+      //   text: 'Mild intimal coronary irregularities',
+      //   color: 'green',
+      // },
+      // 'SCT:194983005': {
+      //   text: 'Aortic insufficiency',
+      //   color: 'darkred',
+      // },
+      'SCT:399232001': {
+        text: '2-chamber',
+      },
+      'SCT:103340004': {
+        text: 'SAX',
+      },
+      'SCT:91134007': {
+        text: 'MV',
+      },
+      'SCT:122972007': {
+        text: 'PV',
+      },
+
+      // Orientations
+      'SCT:24422004': {
+        text: 'Axial',
+        color: '#000000',
+        type: 'orientation',
+      },
+      'SCT:81654009': {
+        text: 'Coronal',
+        color: '#000000',
+        type: 'orientation',
+      },
+      'SCT:30730003': {
+        text: 'Sagittal',
+        color: '#000000',
+        type: 'orientation',
+      },
+    };
+
     // For findings with a a series label, always set them invisible.
-    const { codingValues = {} } = ConfigPoint.getConfig('contextMenus');
+    //const { codingValues = {} } = ConfigPoint.getConfig('contextMenus');
     const codingValue = codingValues[measurement?.findingSite?.ref];
+    console.log('coding values:');
+    console.log(codingValues);
+    console.log(codingValue);
 
     if (codingValue?.seriesLabel === true) {
       visibility = false;
+      console.log(visibility);
     }
 
     csExtensionUtils.annotation.setAnnotationVisibility(annotation.annotationUID, visibility);
@@ -83,8 +152,10 @@ const Fiducial = {
     Cornerstone3DViewportService,
     getValueTypeFromToolType
   ) => {
-    const { annotation: cs3DAnnotation, viewportId } = csToolsEventDetail;
-    const { metadata, data, annotationUID, isVisible } = cs3DAnnotation;
+    // const { annotation: cs3DAnnotation, viewportId } = csToolsEventDetail;
+    // const { metadata, data, annotationUID, isVisible } = cs3DAnnotation;
+    const { annotation, viewportId } = csToolsEventDetail;
+    const { metadata, data, annotationUID, isVisible } = annotation;
 
     if (!metadata || !data) {
       console.warn('Fiducial tool: Missing metadata or data');
@@ -116,7 +187,8 @@ const Fiducial = {
 
     const { points } = data.handles;
 
-    const mappedAnnotations = getMappedAnnotations(cs3DAnnotation, DisplaySetService);
+    //const mappedAnnotations = getMappedAnnotations(cs3DAnnotation, DisplaySetService);
+    const mappedAnnotations = getMappedAnnotations(annotation, DisplaySetService);
 
     const displayText = getDisplayText(mappedAnnotations);
     const getReport = () => _getReport(mappedAnnotations, points, FrameOfReferenceUID);

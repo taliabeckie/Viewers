@@ -1,4 +1,20 @@
-function initDefaultToolGroup(extensionManager, toolGroupService, commandsManager, toolGroupId) {
+import FiducialTool from '../../ucalgary-extension/src/tools/FiducialTool';
+
+export const toolGroupIds = {
+  CT: 'ctToolGroup',
+  PT: 'ptToolGroup',
+  Fusion: 'fusionToolGroup',
+  MIP: 'mipToolGroup',
+  default: 'default',
+};
+
+function initDefaultToolGroup(
+  extensionManager,
+  toolGroupService,
+  commandsManager,
+  toolGroupId,
+  toolsConfig
+) {
   const utilityModule = extensionManager.getModuleEntry(
     '@ohif/extension-cornerstone.utilityModule.tools'
   );
@@ -52,7 +68,7 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
       { toolName: toolNames.Magnify },
       { toolName: toolNames.SegmentationDisplay },
       { toolName: toolNames.CalibrationLine },
-      { toolName: toolNames.Fiducial },
+      { toolName: FiducialTool.toolName },
     ],
     // enabled
     enabled: [{ toolName: toolNames.ImageOverlayViewer }],
@@ -60,7 +76,34 @@ function initDefaultToolGroup(extensionManager, toolGroupService, commandsManage
     disabled: [{ toolName: toolNames.ReferenceLines }],
   };
 
-  toolGroupService.createToolGroupAndAddTools(toolGroupId, tools);
+  const _toolsConfig = {
+    [toolNames.ArrowAnnotate]: {
+      getTextCallback: (callback, eventDetails) =>
+        commandsManager.runCommand('arrowTextCallback', {
+          callback,
+          eventDetails,
+        }),
+
+      changeTextCallback: (data, eventDetails, callback) =>
+        commandsManager.runCommand('arrowTextCallback', {
+          callback,
+          data,
+          eventDetails,
+        }),
+    },
+    ...toolsConfig,
+  };
+  toolGroupService.createToolGroupAndAddTools(toolGroupIds.default, tools, _toolsConfig);
+  toolGroupService.createToolGroupAndAddTools(toolGroupIds.CT, tools);
+  //const viewportId = getActiveViewport().element.id;
+  //const viewportId = viewportGridService.getActiveViewportId();
+  //const renderingEngineId = cornerstone.getActiveViewport().renderingEngine.id;
+  //toolGroupService.addViewportToToolGroup(viewportId, renderingEngineId, toolGroupIds.default);
+  //toolGroupService.addViewportToToolGroup(viewportId, renderingEngineId, toolGroupIds.CT);
+  // commandsManager.runCommand('addViewportToToolGroup', {
+  //   toolGroupId: toolGroupIds.default
+
+  // });
 }
 
 function initSRToolGroup(extensionManager, toolGroupService, commandsManager) {
@@ -231,8 +274,8 @@ function initVolume3DToolGroup(extensionManager, toolGroupService) {
   toolGroupService.createToolGroupAndAddTools('volume3d', tools);
 }
 
-function initToolGroups(extensionManager, toolGroupService, commandsManager) {
-  initDefaultToolGroup(extensionManager, toolGroupService, commandsManager, 'default');
+function initToolGroups(extensionManager, toolGroupService, commandsManager, toolsConfig) {
+  initDefaultToolGroup(extensionManager, toolGroupService, commandsManager, 'default', toolsConfig);
   initSRToolGroup(extensionManager, toolGroupService, commandsManager);
   initMPRToolGroup(extensionManager, toolGroupService, commandsManager);
   initVolume3DToolGroup(extensionManager, toolGroupService);

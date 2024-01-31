@@ -8,6 +8,7 @@ import { id } from './id.js';
 import toolNames from './tools/toolNames';
 import hydrateStructuredReport from './utils/hydrateStructuredReport';
 import createReferencedImageDisplaySet from './utils/createReferencedImageDisplaySet';
+import ExternalAlgorithmService from '../../../ucalgary-extension/src/services/ExternalAlgorithmService';
 
 const Component = React.lazy(() => {
   return import(/* webpackPrefetch: true */ './viewports/OHIFCornerstoneSRViewport');

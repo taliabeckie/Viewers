@@ -10,6 +10,11 @@ import { ProbeAnnotation } from '../../../node_modules/@cornerstonejs/tools/src/
 import { EventTypes, SVGDrawingHelper } from '../../../node_modules/@cornerstonejs/tools/src/types';
 import { StyleSpecifier } from '../../../node_modules/@cornerstonejs/tools/src/types/AnnotationStyle';
 import type { Types } from '@cornerstonejs/core';
+import {
+  addAnnotation,
+  getAnnotations,
+  removeAnnotation,
+} from '../../../node_modules/@cornerstonejs/tools/src/stateManagement/annotation/annotationState';
 
 const FIDUCIAL_TOOL_NAME = 'Fiducial';
 
@@ -88,20 +93,59 @@ export default class FiducialTool extends ProbeTool {
    * @returns The annotation object.
    *
    */
-  addNewAnnotation = (evt: EventTypes.InteractionEventType): ProbeAnnotation => {
+  addNewAnnotation = (evt: any) => {
     const eventDetail = evt.detail;
     const { currentPoints, element } = eventDetail;
 
+    if (!element || !element.dataset) {
+      console.error(
+        'The element object is not valid or does not have the necessary data attributes.'
+      );
+      return;
+    }
+    console.log('element:');
+    console.log(element);
+    console.log(element.dataset);
+
+    const pointsList = [currentPoints];
+    const worldPosPoints = pointsList.map(points => points.world);
+    const enabledElement = getEnabledElement(element);
+    const { viewport, renderingEngine } = enabledElement;
     this.isDrawing = true;
-    const annotation = this.newAnnotationFromPoints(element, [currentPoints]);
+
+    const camera = viewport.getCamera();
+    const { viewPlaneNormal, viewUp } = camera;
+
+    const referencedImageId = this.getReferencedImageId(
+      viewport,
+      worldPosPoints[0],
+      viewPlaneNormal,
+      viewUp
+    );
+
+    const annotation: ProbeAnnotation = {
+      highlighted: true,
+      invalidated: false,
+      isVisible: true,
+      metadata: {
+        toolName: this.getToolName(),
+        viewPlaneNormal: [...viewPlaneNormal] as Types.Point3,
+        viewUp: [...viewUp] as Types.Point3,
+        FrameOfReferenceUID: viewport.getFrameOfReferenceUID(),
+        referencedImageId,
+      },
+      data: {
+        label: '',
+        handles: { points: [[...worldPosPoints] as Types.Point3] },
+        cachedStats: {},
+      },
+    };
 
     if (!annotation) {
       return;
     }
-    //cs3DToolsAnnotation.state.addAnnotation(element, annotation);
 
-    const enabledElement = getEnabledElement(element);
-    const { renderingEngine } = enabledElement;
+    cs3DToolsAnnotation.state.addAnnotation(annotation, element);
 
     const viewportIdsToRender = cs3DToolsUtilities.viewportFilters.getViewportIdsWithToolToRender(
       element,
@@ -124,53 +168,6 @@ export default class FiducialTool extends ProbeTool {
     return annotation;
   };
 
-  newAnnotationFromPoints = (element, pointsList = []) => {
-    if (!pointsList.length) {
-      return;
-    }
-
-    const worldPosPoints = pointsList.map(points => points.world);
-    const enabledElement = getEnabledElement(element);
-    const { viewport } = enabledElement;
-
-    this.isDrawing = true;
-    const camera = viewport.getCamera();
-    const { viewPlaneNormal, viewUp } = camera;
-
-    const referencedImageId = this.getReferencedImageId(
-      viewport,
-      worldPosPoints[0],
-      viewPlaneNormal,
-      viewUp
-    );
-
-    const annotation: ProbeAnnotation = {
-      invalidated: false,
-      highlighted: true,
-      isVisible: true,
-      metadata: {
-        toolName: this.getToolName(),
-        viewPlaneNormal: [...viewPlaneNormal] as Types.Point3,
-        viewUp: [...viewUp] as Types.Point3,
-        FrameOfReferenceUID: viewport.getFrameOfReferenceUID(),
-        referencedImageId,
-      },
-      data: {
-        label: '',
-        handles: { points: [[...worldPosPoints] as Types.Point3] },
-        cachedStats: {},
-      },
-    };
-
-    return annotation;
-  };
-
-  // postTouchStartCallback = (
-  //   evt: EventTypes.InteractionEventType
-  // ): ProbeAnnotation => {
-  //   return this.postMouseDownCallback(evt);
-  // };
-
   /**
    * It is used to draw the annotation in each request animation frame.
    *
@@ -182,19 +179,19 @@ export default class FiducialTool extends ProbeTool {
     enabledElement: Types.IEnabledElement,
     svgDrawingHelper: SVGDrawingHelper
   ): boolean => {
-    let renderStatus = false;
     const { viewport } = enabledElement;
+    const { element } = viewport;
 
-    if (!this.editData) {
-      return renderStatus;
-    }
-
-    const annotations = this.filterInteractableAnnotationsForElement(viewport.element, [
-      this.editData.annotation,
-    ]);
+    let annotations = cs3DToolsAnnotation.state.getAnnotations(this.getToolName(), element);
 
     if (!annotations?.length) {
-      return renderStatus;
+      return;
+    }
+
+    annotations = this.filterInteractableAnnotationsForElement(element, annotations);
+
+    if (!annotations?.length) {
+      return;
     }
 
     const targetId = this.getTargetId(viewport);
@@ -205,34 +202,23 @@ export default class FiducialTool extends ProbeTool {
       toolName: this.getToolName(),
       viewportId: enabledElement.viewport.id,
     };
+
     const { handleRadius } = this.configuration;
 
     for (let i = 0; i < annotations.length; i++) {
-      const annotation = this.editData.annotation;
+      const annotation = annotations[i];
       const annotationUID = annotation.annotationUID;
       const data = annotation.data;
       const point = data.handles.points[0];
-      const canvasCoordinates = viewport.worldToCanvas(point);
+      const canvasCoordinates = viewport.worldToCanvas(point); //potential error source
       styleSpecifier.annotationUID = annotationUID;
 
       const color = this.getStyle('color', styleSpecifier, annotation);
 
-      // if (!data.cachedStats[targetId] || data.cachedStats[targetId].value == null) {
-      //   data.cachedStats[targetId] = {
-      //     Modality: null,
-      //     index: null,
-      //     value: null,
-      //   };
-
-      //   this._calculateCachedStats(annotation, renderingEngine, enabledElement);
-      // } else if (annotation.invalidated) {
-      //   this._calculateCachedStats(annotation, renderingEngine, enabledElement);
-      // }
-
       // If rendering engine has been destroyed while rendering
       if (!viewport.getRenderingEngine()) {
         console.warn('Rendering Engine has been destroyed');
-        return renderStatus;
+        return;
       }
 
       const handleGroupUID = '0';
@@ -244,8 +230,6 @@ export default class FiducialTool extends ProbeTool {
         [canvasCoordinates],
         { color, handleRadius }
       );
-
-      renderStatus = true;
 
       const textLines = this._getTextLines(data, targetId);
       if (textLines) {
@@ -266,8 +250,6 @@ export default class FiducialTool extends ProbeTool {
           option
         );
       }
-
-      return renderStatus;
     }
   };
 

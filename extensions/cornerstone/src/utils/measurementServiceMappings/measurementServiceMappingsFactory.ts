@@ -203,6 +203,9 @@ const measurementServiceMappingsFactory = (
   const customToolsMappingFactory = getCustomToolsMappingFactory();
   Object.keys(customToolsMappingFactory).forEach(factoryKey => {
     const customToolMappingFactory = customToolsMappingFactory[factoryKey];
+    console.log('custom tools mapping factory: ');
+    console.log(customToolMappingFactory);
+    console.log(factoryKey);
     factories[factoryKey] = {
       toAnnotation: customToolMappingFactory.toAnnotation,
       toMeasurement: csToolsAnnotation =>

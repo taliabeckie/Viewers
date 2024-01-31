@@ -4,7 +4,7 @@ import {
   WindowLevelMenuItem,
 } from '@ohif/ui';
 import { defaults } from '@ohif/core';
-import ToolbarCinePlayer from '../../ucalgary-extension/src/cine/ToolBarCinePlayer';
+import { ToolbarService } from '@ohif/core';
 
 const { windowLevelPresets } = defaults;
 /**
@@ -410,6 +410,38 @@ const toolbarButtons = [
           'Magnify'
         ),
 
+        ToolbarService._createToolButton(
+          'Angle',
+          'tool-angle',
+          'Angle',
+          [
+            {
+              commandName: 'setToolActive',
+              commandOptions: {
+                toolName: 'Angle',
+              },
+              context: 'CORNERSTONE',
+            },
+          ],
+          'Angle'
+        ),
+
+        ToolbarService._createToolButton(
+          'Probe',
+          'tool-probe',
+          'Probe',
+          [
+            {
+              commandName: 'setToolActive',
+              commandOptions: {
+                toolName: 'DragProbe',
+              },
+              context: 'CORNERSTONE',
+            },
+          ],
+          'Probe'
+        ),
+
         _createActionButton(
           'Reset',
           'tool-reset',
@@ -423,26 +455,65 @@ const toolbarButtons = [
           ],
           'Reset'
         ),
-        // _createToggleButton('StackImageSync', 'link', 'Stack Image Sync', [
-        //   {
-        //     commandName: 'toggleStackImageSync',
-        //     commandOptions: {},
-        //     context: 'CORNERSTONE',
-        //   },
-        // ]),
-        // _createToggleButton(
-        //   'ReferenceLines',
-        //   'tool-referenceLines', // change this with the new icon
-        //   'Reference Lines',
-        //   [
-        //     {
-        //       commandName: 'toggleReferenceLines',
-        //       commandOptions: {},
-        //       context: 'CORNERSTONE',
-        //     },
-        //   ]
-        // ),
       ],
+    },
+
+    ActionButtons: {
+      id: 'ActionButtons',
+      type: 'ActionButton',
+      props: {
+        items: [
+          // {
+          //   id: 'runExternalAlgorithm',
+          //   icon: 'pencil',
+          //   tooltip: 'External Algorithm',
+          //   label: 'Run Algorithm',
+          //   commands: [
+          //     {
+          //       commandName: 'runExternalAlgorithm',
+          //       commandOptions: {
+          //         items: [
+          //           {
+          //             id: 'GenerateContours',
+          //             commandName: 'initiateExternalAlgorithm',
+          //             commandOptions: {
+          //               name: 'Generate Contours',
+          //               endpointName: 'GenerateContours',
+          //               algorithm: { algorithmName: 'GenerateContours', version: '0.0.1' },
+          //             },
+          //             context: 'CORNERSTONE',
+          //           },
+          //           {
+          //             id: 'APIPrediction',
+          //             commandName: 'initiateExternalAlgorithm',
+          //             commandOptions: {
+          //               name: 'AI Prediction',
+          //               endpointName: 'APIPrediction',
+          //               algorithm: { algorithmName: 'DiseasePrediction', version: '0.0.1' },
+          //             },
+          //             context: 'CORNERSTONE',
+          //           },
+          //         ],
+          //       },
+          //       context: 'CORNERSTONE',
+          //     },
+          //   ],
+          // },
+          {
+            id: 'openCreateReportDialog',
+            icon: 'pencil',
+            tooltip: 'Save Annotations',
+            label: 'Save Annotations',
+            commands: [
+              {
+                commandName: 'openCreateReportDialog',
+                commandOptions: {},
+                context: 'CORNERSTONE',
+              },
+            ],
+          },
+        ],
+      },
     },
   },
 ];

@@ -10,7 +10,7 @@ import Label from '../../../../platform/ui/src/components/Label/Label';
 import { useExternalAlgorithm } from '../../../../ucalgary-extension/src/contexts/ExternalAlgorithmContext';
 import ResultChart from '../../../../ucalgary-extension/src/external-algorithm/resultChart/ResultChart';
 import ResultReportItem from '../../../../ucalgary-extension/src/external-algorithm/ResultReport/ResultReportItem';
-
+import ProgressBar from '../../../../ucalgary-extension/src/external-algorithm/ProgressBar';
 import createReportDialogPrompt, {
   CREATE_REPORT_DIALOG_RESPONSE,
 } from './createReportDialogPrompt';
@@ -141,6 +141,15 @@ export default function PanelMeasurementTable({
 
       const storeAPI = async () => {
         //console.log('storeAPI is accessed');
+        // const body: () => (
+        //   <ProgressBar
+        //     bgcolor="yellow"
+        //     progressCheck={progressCheck}
+        //     onComplete={onSubmitHandler}
+        //     onError={onceOnError}
+        //   />
+        // )
+        const body = '';
         return commandsManager.runCommand('initiateExternalAlgorithm', {
           //needs to be added to this commandsManager
           name: 'Store Results to backend API',
@@ -153,6 +162,7 @@ export default function PanelMeasurementTable({
           sopInstanceUID: 'test', //SOPInstanceUID,
           inputValue,
           inputValue2,
+          body,
         });
       };
 
@@ -161,10 +171,32 @@ export default function PanelMeasurementTable({
   }
 
   const startRunExternalAlgorithm = () => {
+    const bodyList = (items, onSelectHandler) => (
+      <div className="bg-primary-dark flex flex-col justify-between p-4">
+        {items.map(item => {
+          let itemToDisplay = item.commandOptions.name;
+
+          if (item.commandOptions?.algorithm?.version) {
+            itemToDisplay += ` (v: ${item.commandOptions?.algorithm?.version})`;
+          }
+          return (
+            <span
+              key={item.id}
+              className="hover:bg-secondary-dark cursor-pointer py-2 text-base text-white"
+              onClick={onSelectHandler.bind(null, { item })}
+            >
+              {itemToDisplay}
+            </span>
+          );
+        })}
+      </div>
+    );
+
     return commandsManager.runCommand('runExternalAlgorithm', {
       name: 'Generate Contours',
       endpointName: 'GenerateContours',
       algorithm: { algorithmName: 'GenerateContours', version: '0.0.1' },
+      bodyList: bodyList,
     });
   };
 
