@@ -15,6 +15,9 @@ import {
   getAnnotations,
   removeAnnotation,
 } from '../../../node_modules/@cornerstonejs/tools/src/stateManagement/annotation/annotationState';
+import { Annotations } from '@cornerstonejs/tools/dist/types/types';
+import { MouseMoveEventType } from '@cornerstonejs/tools/dist/types/types/EventTypes';
+import { composeInitialProps } from 'react-i18next';
 
 const FIDUCIAL_TOOL_NAME = 'Fiducial';
 
@@ -89,11 +92,11 @@ export default class FiducialTool extends ProbeTool {
    * Based on the current position of the mouse and the current imageId to create
    * a Fiducial Annotation and stores it in the annotationManager
    *
-   * @param evt -  EventTypes.NormalizedMouseEventType  EventTypes.MouseDownActivateEventType
+   * @param evt -  EventTypes.NormalizedMouseEventType
    * @returns The annotation object.
    *
    */
-  addNewAnnotation = (evt: any) => {
+  addNewAnnotation = (evt: EventTypes.InteractionEventType) => {
     const eventDetail = evt.detail;
     const { currentPoints, element } = eventDetail;
 
@@ -103,12 +106,10 @@ export default class FiducialTool extends ProbeTool {
       );
       return;
     }
-    console.log('element:');
-    console.log(element);
-    console.log(element.dataset);
 
     const pointsList = [currentPoints];
-    const worldPosPoints = pointsList.map(points => points.world);
+    const worldPosPointste = pointsList.map(points => points.world);
+    const worldPosPoints = this.correctFormatting(worldPosPointste);
     const enabledElement = getEnabledElement(element);
     const { viewport, renderingEngine } = enabledElement;
     this.isDrawing = true;
@@ -123,7 +124,7 @@ export default class FiducialTool extends ProbeTool {
       viewUp
     );
 
-    const annotation: ProbeAnnotation = {
+    const annotation = {
       highlighted: true,
       invalidated: false,
       isVisible: true,
@@ -209,8 +210,10 @@ export default class FiducialTool extends ProbeTool {
       const annotation = annotations[i];
       const annotationUID = annotation.annotationUID;
       const data = annotation.data;
+
       const point = data.handles.points[0];
-      const canvasCoordinates = viewport.worldToCanvas(point); //potential error source
+      const newpoint = this.correctFormatting(point);
+      const canvasCoordinates = viewport.worldToCanvas(newpoint);
       styleSpecifier.annotationUID = annotationUID;
 
       const color = this.getStyle('color', styleSpecifier, annotation);
@@ -227,7 +230,7 @@ export default class FiducialTool extends ProbeTool {
         svgDrawingHelper,
         annotationUID,
         handleGroupUID,
-        [canvasCoordinates],
+        [canvasCoordinates], // into [,,]
         { color, handleRadius }
       );
 
@@ -255,6 +258,13 @@ export default class FiducialTool extends ProbeTool {
 
   _getTextLines(data, targetId) {
     return data.label ? [data.label] : undefined;
+  }
+
+  correctFormatting(input) {
+    if (Array.isArray(input) && input.length === 1 && input[0].length === 3) {
+      return input[0];
+    }
+    return input;
   }
 }
 
