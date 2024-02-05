@@ -740,8 +740,8 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
       const { dimensions } = imageVolume;
       const slabThickness = Math.sqrt(
         dimensions[0] * dimensions[0] +
-        dimensions[1] * dimensions[1] +
-        dimensions[2] * dimensions[2]
+          dimensions[1] * dimensions[1] +
+          dimensions[2] * dimensions[2]
       );
 
       return slabThickness;

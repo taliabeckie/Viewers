@@ -108,8 +108,8 @@ export default class FiducialTool extends ProbeTool {
     }
 
     const pointsList = [currentPoints];
-    const worldPosPointste = pointsList.map(points => points.world);
-    const worldPosPoints = this.correctFormatting(worldPosPointste);
+    const worldPosPoints1 = pointsList.map(points => points.world);
+    const worldPosPoints = this.correctFormatting(worldPosPoints1);
     const enabledElement = getEnabledElement(element);
     const { viewport, renderingEngine } = enabledElement;
     this.isDrawing = true;

@@ -1,5 +1,4 @@
 export default [
-  'Fiducial',
   'Length',
   'EllipticalROI',
   'CircleROI',

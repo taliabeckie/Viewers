@@ -14,12 +14,9 @@ const customToolsMappingFactory = {};
  */
 function assertCustomToolMappingFactory(customToolFactory = {}) {
   const hasMethod = methodName =>
-    methodName in customToolFactory &&
-    typeof customToolFactory[methodName] === 'function';
+    methodName in customToolFactory && typeof customToolFactory[methodName] === 'function';
   return (
-    hasMethod('toAnnotation') &&
-    hasMethod('toMeasurement') &&
-    hasMethod('getMatchingCriteriaArray')
+    hasMethod('toAnnotation') && hasMethod('toMeasurement') && hasMethod('getMatchingCriteriaArray')
   );
 }
 

@@ -95,15 +95,6 @@ function initDefaultToolGroup(
   };
   toolGroupService.createToolGroupAndAddTools(toolGroupIds.default, tools, _toolsConfig);
   toolGroupService.createToolGroupAndAddTools(toolGroupIds.CT, tools);
-  //const viewportId = getActiveViewport().element.id;
-  //const viewportId = viewportGridService.getActiveViewportId();
-  //const renderingEngineId = cornerstone.getActiveViewport().renderingEngine.id;
-  //toolGroupService.addViewportToToolGroup(viewportId, renderingEngineId, toolGroupIds.default);
-  //toolGroupService.addViewportToToolGroup(viewportId, renderingEngineId, toolGroupIds.CT);
-  // commandsManager.runCommand('addViewportToToolGroup', {
-  //   toolGroupId: toolGroupIds.default
-
-  // });
 }
 
 function initSRToolGroup(extensionManager, toolGroupService, commandsManager) {

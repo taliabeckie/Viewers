@@ -1,12 +1,13 @@
-import { registerIcon } from '@ohif/ui';
+import { addIcon } from '@ohif/ui';
 import iconToolFiducial from '../../platform/ui/src/assets/icons/tool-fiducial.svg';
-import iconToolFreehand from '../../platform/ui/src/assets/icons/tool-freehand.svg';
+//import iconToolFreehand from '../../platform/ui/src/assets/icons/tool-freehand.svg';
 import FiducialTool from './tools/FiducialTool';
 import FiducialToolMappingFactory from '../../ucalgary-extension/utils/measurementServiceMappings/Fiducial';
-import PlanarFreehandROIToolMappingFactory from '../../ucalgary-extension/utils/measurementServiceMappings/PlanarFreehandROI';
+//import PlanarFreehandROIToolMappingFactory from '../../ucalgary-extension/utils/measurementServiceMappings/PlanarFreehandROI';
 import { registerCustomCornerstoneTools } from '@ohif/extension-cornerstone';
 import { PlanarFreehandROITool, annotation } from '@cornerstonejs/tools';
-import { ConfigPoint } from '../../node_modules/config-point/dist/config-point';
+//import { ConfigPoint } from '../../node_modules/config-point/dist/config-point';
+import ConfigPoint from 'config-point';
 import { isEmpty, forIn } from 'lodash';
 
 /**
@@ -54,8 +55,8 @@ export default function configureTools() {
 
   configureToolStyles(config);
   // register the svg icon in the list of app svgs.
-  registerIcon('tool-fiducial', iconToolFiducial);
-  registerIcon('tool-freehand', iconToolFreehand);
+  //addIcon('tool-fiducial', iconToolFiducial);
+  //  addIcon('tool-freehand', iconToolFreehand);
   // register in native cs3d extension the custom tool class, mapping factory and the tool cursor.
   registerCustomCornerstoneTools([
     {
@@ -67,14 +68,14 @@ export default function configureTools() {
         viewBox: { x: 32, y: 32 },
       },
     },
-    {
-      CustomTool: PlanarFreehandROITool,
-      toolName: PlanarFreehandROITool.toolName,
-      CustomToolMappingFactory: PlanarFreehandROIToolMappingFactory,
-      cursor: {
-        icon: '<g><path fill="{{color}}" d="M 18.310547 0.001953125 L 1.4394531 16.873047 L 0 24 L 7.1289062 22.5625 L 24.001953 5.6914062 L 18.310547 0.001953125 z M 18.310547 2.828125 L 21.171875 5.6894531 L 7.5546875 19.306641 L 4.6953125 16.445312 L 15.519531 5.6191406 L 18.365234 8.4667969 L 19.779297 7.0527344 L 16.933594 4.2050781 L 18.310547 2.828125 z M 18.355469 16.423828 L 18.355469 19.169922 L 15.507812 19.169922 L 15.507812 20.898438 L 18.355469 20.898438 L 18.355469 23.847656 L 20.083984 23.847656 L 20.083984 20.898438 L 22.931641 20.898438 L 22.931641 19.169922 L 20.083984 19.169922 L 20.083984 16.423828 L 18.355469 16.423828 z M 3.2792969 17.861328 L 6.140625 20.720703 L 2.5585938 21.445312 L 3.2792969 17.861328 z "/></g>',
-        viewBox: { x: 32, y: 32 },
-      },
-    },
+    // {
+    //   CustomTool: PlanarFreehandROITool,
+    //   toolName: PlanarFreehandROITool.toolName,
+    //   CustomToolMappingFactory: PlanarFreehandROIToolMappingFactory,
+    //   cursor: {
+    //     icon: '<g><path fill="{{color}}" d="M 18.310547 0.001953125 L 1.4394531 16.873047 L 0 24 L 7.1289062 22.5625 L 24.001953 5.6914062 L 18.310547 0.001953125 z M 18.310547 2.828125 L 21.171875 5.6894531 L 7.5546875 19.306641 L 4.6953125 16.445312 L 15.519531 5.6191406 L 18.365234 8.4667969 L 19.779297 7.0527344 L 16.933594 4.2050781 L 18.310547 2.828125 z M 18.355469 16.423828 L 18.355469 19.169922 L 15.507812 19.169922 L 15.507812 20.898438 L 18.355469 20.898438 L 18.355469 23.847656 L 20.083984 23.847656 L 20.083984 20.898438 L 22.931641 20.898438 L 22.931641 19.169922 L 20.083984 19.169922 L 20.083984 16.423828 L 18.355469 16.423828 z M 3.2792969 17.861328 L 6.140625 20.720703 L 2.5585938 21.445312 L 3.2792969 17.861328 z "/></g>',
+    //     viewBox: { x: 32, y: 32 },
+    //   },
+    // },
   ]);
 }

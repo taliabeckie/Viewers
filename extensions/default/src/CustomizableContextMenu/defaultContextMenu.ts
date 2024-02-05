@@ -5,7 +5,8 @@ const defaultContextMenu = {
     // Get the items from the UI Customization for the menu name (and have a custom name)
     {
       id: 'forExistingMeasurement',
-      selector: ({ nearbyToolData }) => !!nearbyToolData,
+      selector: ({ toolName, nearbyToolData }) =>
+        toolName === 'PlanarFreehandROI' && !!nearbyToolData,
       items: [
         {
           label: 'Delete measurement',
@@ -19,65 +20,196 @@ const defaultContextMenu = {
           label: 'LV endo',
           commands: [
             {
-              commandName: 'labelLVendo',
+              commandName: 'labelMeasurement',
+              label: 'LV endo',
             },
           ],
         },
-
         {
           label: 'LV epi',
           commands: [
             {
-              commandName: 'labelLVepi',
+              commandName: 'labelMeasurement',
+              label: 'LV epi',
             },
           ],
         },
-
         {
-          label: 'RV endo', //ADD COLOR
+          label: 'RV endo',
           commands: [
             {
-              commandName: 'labelRVendo',
+              commandName: 'labelMeasurement',
+              label: 'RV endo',
             },
           ],
         },
-
         {
           label: 'RV epi',
           commands: [
             {
-              commandName: 'labelRVepi',
+              commandName: 'labelMeasurement',
+              label: 'RV epi',
             },
           ],
         },
-
         {
           label: 'LA endo',
           commands: [
             {
-              commandName: 'labelLAendo',
+              commandName: 'labelMeasurement',
+              label: 'LA endo',
             },
           ],
         },
-
         {
           label: 'RA endo',
           commands: [
             {
-              commandName: 'labelRAendo',
+              commandName: 'labelMeasurement',
+              label: 'RA endo',
             },
           ],
         },
+        {
+          label: 'Aorta desc',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'Aorta desc',
+            },
+          ],
+        },
+        {
+          label: 'Custom label',
+          commands: [
+            {
+              commandName: 'setMeasurementLabel',
+            },
+          ],
+        },
+      ],
+    },
 
-        // {
-        //   label: 'Aorta desc',
-        //   commands: [
-        //     {
-        //       commandName: 'labelLAortadesc', //not recognized in current context
-        //     },
-        //   ],
-        // },
-
+    {
+      id: 'fiducialLabellingSelectionMenu',
+      selector: ({ toolName, nearbyToolData }) => toolName === 'Fiducial' && !!nearbyToolData,
+      items: [
+        {
+          label: 'Delete measurement',
+          commands: [
+            {
+              commandName: 'deleteMeasurement',
+            },
+          ],
+        },
+        {
+          label: 'RVI AHA',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'RVI site - AHA',
+            },
+          ],
+        },
+        {
+          label: 'RVI other',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'RVI site - other',
+            },
+          ],
+        },
+        {
+          label: 'AV mid',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'AV mid',
+            },
+          ],
+        },
+        {
+          label: 'AV RCC',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'AV RCC',
+            },
+          ],
+        },
+        {
+          label: 'AV LCC',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'AV LCC',
+            },
+          ],
+        },
+        {
+          label: 'AV NCC',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'AV NCC',
+            },
+          ],
+        },
+        {
+          label: 'MV mid',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'MV mid',
+            },
+          ],
+        },
+        {
+          label: 'PV mid',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'PV mid',
+            },
+          ],
+        },
+        {
+          label: 'TV mid',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'TV mid',
+            },
+          ],
+        },
+        {
+          label: 'LM ostium',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'LM ostium',
+            },
+          ],
+        },
+        {
+          label: 'RCA ostium',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'RCA ostium',
+            },
+          ],
+        },
+        {
+          label: 'LCx ostium',
+          commands: [
+            {
+              commandName: 'labelMeasurement',
+              label: 'LCx ostium',
+            },
+          ],
+        },
         {
           label: 'Custom label',
           commands: [
@@ -95,17 +227,13 @@ const defaultContextMenu = {
       items: [
         {
           label: 'SAX',
-          commands: [
-            {
-              commandName: 'setMeasurementLabel', //find a way to send viewportUID? //rn is tied to Fiducial. After getting Fiducial to work I can create functions in commandsModule related to these
-            },
-          ],
+          commands: [],
         },
         {
           label: '4-Chamber',
           commands: [
             {
-              commandName: 'setMeasurementLabel',
+              commandName: '',
             },
           ],
         },
@@ -113,7 +241,7 @@ const defaultContextMenu = {
           label: '3-Chamber',
           commands: [
             {
-              commandName: 'setMeasurementLabel',
+              commandName: '',
             },
           ],
         },
@@ -121,30 +249,11 @@ const defaultContextMenu = {
           label: '2-Chamber',
           commands: [
             {
-              commandName: 'setMeasurementLabel',
+              commandName: '',
             },
           ],
         },
-        // 'SegmentationCardiac:4ch': {
-        //   text: '4-chamber',
-        //   color: '#000000',
-        //   seriesLabel: true,
-        // },
-        // 'SegmentationCardiac:3ch': {
-        //   text: '3-chamber',
-        //   color: '#000000',
-        //   seriesLabel: true,
-        // },
-        // 'SCT:399232001': {
-        //   text: '2-chamber',
-        //   color: '#000000',
-        //   seriesLabel: true,
-        // },
-        // 'SCT:103340004': {
-        //   text: 'SAX',
-        //   color: '#000000',
-        //   seriesLabel: true,
-        // },
+
         // 'SegmentationCardiac:av': {
         //   text: 'AV',
         //   color: '#000000',
@@ -191,57 +300,3 @@ const defaultContextMenu = {
 };
 
 export default defaultContextMenu;
-
-// // fiducial
-// 'SegmentationCardiac:20000101': {
-//   text: 'RVI site - AHA',
-//   color: '#191970',
-// },
-// 'SegmentationCardiac:20000102': {
-//   text: 'RVI site - other',
-//   color: '#0000FF',
-// },
-// 'SegmentationCardiac:20000201': {
-//   text: 'AV mid',
-//   color: '#4169E1',
-// },
-// 'SegmentationCardiac:20000202': {
-//   text: 'AV RCC',
-//   color: '#7B68EE',
-// },
-// 'SegmentationCardiac:20000203': {
-//   text: 'AV LCC',
-//   color: '#6495ED',
-// },
-// 'SegmentationCardiac:20000204': {
-//   text: 'AV NCC',
-//   color: '#1E90FF',
-// },
-// 'SegmentationCardiac:20000301': {
-//   text: 'MV mid',
-//   color: '#00BFFF',
-// },
-// 'SegmentationCardiac:20000401': {
-//   text: 'PV mid',
-//   color: '#87CEEB',
-// },
-// 'SegmentationCardiac:20000501': {
-//   text: 'TV mid',
-//   color: '#87CEFA',
-// },
-// 'SegmentationCardiac:20000601': {
-//   text: 'LM ostium',
-//   color: '#B0E0E6',
-// },
-// 'SegmentationCardiac:20000602': {
-//   text: 'RCA ostium',
-//   color: '#F0F8FF',
-// },
-// 'SegmentationCardiac:20000603': {
-//   text: 'LCx ostium',
-//   color: '#B0C4DE',
-// },
-// 'SegmentationCardiac:20000701': {
-//   text: 'Other',
-//   color: '#8A2BE2',
-// },

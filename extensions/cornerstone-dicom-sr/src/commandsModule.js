@@ -385,6 +385,7 @@ const commandsModule = props => {
         sopInstanceUID = '',
         inputValue,
         inputValue2,
+        progressBar,
       } = runProps;
       console.log('External Algorithm initiate', name);
       const endpointUrl = apiEndpoints[endpointName];

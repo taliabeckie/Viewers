@@ -2,24 +2,26 @@ import { hotkeys } from '@ohif/core';
 import { id } from './id';
 import toolbarButtons from './toolbarButtons';
 import initToolGroups from './initToolGroups';
+import FiducialTool from '../../ucalgary-extension/src/tools/FiducialTool';
+import moreTools from './moreTools';
 
 //const hotkeys =
 // ((window || {}).config || {})['hotkeys'] ||
 // coreHotkeys.defaults.hotkeyBindings;
 
-const configs = {
-  Length: {},
-  PlanarFreehandROI: {
-    alwaysRenderOpenContourHandles: {
-      enabled: true,
-      radius: 2,
-    },
-    interpolation: {
-      interpolateOnAdd: false,
-      interpolateOnEdit: false,
-    },
-  },
-};
+// const configs = {
+//   Length: {},
+//   PlanarFreehandROI: {
+//     alwaysRenderOpenContourHandles: {
+//       enabled: true,
+//       radius: 2,
+//     },
+//     interpolation: {
+//       interpolateOnAdd: false,
+//       interpolateOnEdit: false,
+//     },
+//   },
+// };
 
 const cornerstone = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
@@ -94,6 +96,7 @@ function modeFactory({ modeConfiguration }) {
       measurementService.clearMeasurements();
 
       // Init Default and SR ToolGroups
+
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
       let unsubscribe;
@@ -126,7 +129,7 @@ function modeFactory({ modeConfiguration }) {
       ));
 
       toolbarService.init(extensionManager);
-      toolbarService.addButtons(toolbarButtons);
+      toolbarService.addButtons([...toolbarButtons, ...moreTools]);
       toolbarService.createButtonSection('primary', [
         'Freehand',
         'Fiducial',
@@ -136,7 +139,6 @@ function modeFactory({ modeConfiguration }) {
         'Pan',
         'Layout',
         'MoreTools',
-        //    'Cine',
       ]);
     },
     /**
@@ -197,6 +199,18 @@ function modeFactory({ modeConfiguration }) {
                   namespace: cornerstone.viewport,
                   displaySetsToDisplay: [ohif.sopClassHandler],
                 },
+                // {
+                //   namespace: tracked.viewport,
+                //   displaySetsToDisplay: [ohif.sopClassHandler],
+                // },
+                {
+                  namespace: dicomvideo.viewport,
+                  displaySetsToDisplay: [dicomvideo.sopClassHandler],
+                },
+                {
+                  namespace: dicompdf.viewport,
+                  displaySetsToDisplay: [dicompdf.sopClassHandler],
+                },
               ],
             },
           };
@@ -214,7 +228,12 @@ function modeFactory({ modeConfiguration }) {
      * Used to initialize 'DisplaySetService' with the provided SOPClass modules.
      * Handles the creation of the displaySets.
      */
-    sopClassHandlers: [ohif.sopClassHandler],
+    sopClassHandlers: [
+      ohif.sopClassHandler,
+      dicomsr.sopClassHandler,
+      dicompdf.sopClassHandler,
+      dicomvideo.sopClassHandler,
+    ],
     /** hotkeys for mode */
     hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };

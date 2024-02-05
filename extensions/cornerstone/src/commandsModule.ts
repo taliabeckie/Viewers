@@ -14,7 +14,6 @@ import {
 } from '@cornerstonejs/tools';
 import { Types as OhifTypes } from '@ohif/core';
 import { vec3, mat4 } from 'gl-matrix';
-
 import CornerstoneViewportDownloadForm from './utils/CornerstoneViewportDownloadForm';
 import callInputDialog from './utils/callInputDialog';
 import toggleStackImageSync from './utils/stackSync/toggleStackImageSync';
@@ -22,6 +21,7 @@ import { getFirstAnnotationSelected } from './utils/measurementServiceMappings/u
 import getActiveViewportEnabledElement from './utils/getActiveViewportEnabledElement';
 import { CornerstoneServices } from './types';
 import labelPhasesDialogPrompt from '../../../ucalgary-extension/src/modals/labelPhasesDialogPrompt';
+import { getEnabledElement as OHIFgetEnabledElement } from './state';
 
 function commandsModule({
   servicesManager,
@@ -43,6 +43,14 @@ function commandsModule({
   function _getActiveViewportEnabledElement() {
     return getActiveViewportEnabledElement(viewportGridService);
   }
+
+  function _getActiveEnabledElement() {
+    const { activeViewportIndex } = viewportGridService.getState();
+    const { element } = OHIFgetEnabledElement(activeViewportIndex) || {};
+
+    return element;
+  }
+
   const actions = {
     /**
      * Generates the selector props for the context menu, specific to
@@ -88,6 +96,8 @@ function commandsModule({
 
       commandsManager.run(options, optionsToUse);
     },
+
+    getActiveEnabledElement: () => _getActiveEnabledElement(),
 
     getNearbyToolData({ nearbyToolData, element, canvasCoordinates }) {
       return nearbyToolData ?? cstUtils.getAnnotationNearPoint(element, canvasCoordinates);
@@ -152,63 +162,7 @@ function commandsModule({
         false
       );
     },
-
-    labelLVendo: ({ uid }) => {
-      const label = 'LV endo';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelLVepi: ({ uid }) => {
-      const label = 'LV epi';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelRVendo: ({ uid }) => {
-      const label = 'RV endo';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelRVepi: ({ uid }) => {
-      const label = 'RV epi';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelLAendo: ({ uid }) => {
-      const label = 'LA endo';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelRAendo: ({ uid }) => {
-      const label = 'RA endo';
-      const measurement = measurementService.getMeasurement(uid);
-      const updatedMeasurement = Object.assign({}, measurement, {
-        label,
-      });
-      measurementService.update(updatedMeasurement.uid, updatedMeasurement, true);
-    },
-
-    labelAortadesc: ({ uid }) => {
-      const label = 'Aorta desc';
+    labelMeasurement: ({ uid, label }) => {
       const measurement = measurementService.getMeasurement(uid);
       const updatedMeasurement = Object.assign({}, measurement, {
         label,
@@ -673,6 +627,37 @@ function commandsModule({
       });
     },
 
+    //smoothing function
+    interpolateSelectedPlanarFreehandAnnotation: props => {
+      const { knotsRatioPercentage } = props;
+      const viewerElement = _getActiveEnabledElement();
+      const enabledElement = _getActiveViewportEnabledElement();
+
+      if (!enabledElement) {
+        return;
+      }
+
+      const { viewport } = enabledElement;
+
+      const firstAnnotationSelected = getFirstAnnotationSelected(viewerElement);
+
+      if (!firstAnnotationSelected) {
+        return;
+      }
+
+      if (viewport instanceof StackViewport) {
+        const interpolated = cstUtils.planarFreehandROITool.interpolateAnnotation(
+          enabledElement,
+          firstAnnotationSelected,
+          knotsRatioPercentage
+        );
+
+        if (interpolated) {
+          viewport.render();
+        }
+      }
+    },
+
     openLabelPhasesDialogPrompt: () => {
       try {
         labelPhasesDialogPrompt(uiDialogService).then((promptResult = {}) => {
@@ -681,11 +666,6 @@ function commandsModule({
             //save phase values somewhere!
             console.log(SeriesDescription);
           }
-          // if (phase1) {
-          //  commandsManager.runCommand('createReport', {
-          //     phase1,
-          //   });
-          //  }
         });
       } catch (e) {
         console.warn('Something went wrong while getting phase number from dialog', e);
@@ -694,6 +674,17 @@ function commandsModule({
   };
 
   const definitions = {
+    // showViewerContextMenu: {
+    //   commandFn: actions.showViewerContextMenu,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    // closeViewerContextMenu: {
+    //   commandFn: actions.closeViewerContextMenu,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+
     // The command here is to show the viewer context menu, as being the
     // context menu
     showCornerstoneContextMenu: {
@@ -723,32 +714,12 @@ function commandsModule({
     setMeasurementLabel: {
       commandFn: actions.setMeasurementLabel,
     },
-    labelLVendo: {
-      commandFn: actions.labelLVendo,
+    labelMeasurement: {
+      commandFn: actions.labelMeasurement,
     },
-    labelLVepi: {
-      commandFn: actions.labelLVepi,
-    },
-    labelRVendo: {
-      commandFn: actions.labelRVendo,
-    },
-    labelRVepi: {
-      commandFn: actions.labelRVepi,
-    },
-    labelLAendo: {
-      commandFn: actions.labelLAendo,
-    },
-    labelRAendo: {
-      commandFn: actions.labelRAendo,
-    },
-    labelAortadesc: {
-      commandFn: actions.labelAortadesc,
-    },
-
     updateMeasurement: {
       commandFn: actions.updateMeasurement,
     },
-
     setWindowLevel: {
       commandFn: actions.setWindowLevel,
     },
@@ -854,6 +825,66 @@ function commandsModule({
       storeContexts: [],
       options: {},
     },
+    // toggleCrosshairs: {
+    //   commandFn: actions.toggleCrosshairs,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    // createSegmentationForDisplaySet: {
+    //   commandFn: actions.createSegmentationForDisplaySet,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    // addSegmentationRepresentationToToolGroup: {
+    //   commandFn: actions.addSegmentationRepresentationToToolGroup,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    // getLabelmapVolumes: {
+    //   commandFn: actions.getLabelmapVolumes,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+
+    // worldPointsToActiveCanvas: {
+    //   commandFn: actions.worldPointsToActiveCanvas,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    // canvasPointsToWorld: {
+    //   commandFn: actions.canvasPointsToWorld,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+
+    // changeToolConfiguration: {
+    //   commandFn: actions.changeToolConfiguration,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+    interpolateSelectedPlanarFreehandAnnotation: {
+      commandFn: actions.interpolateSelectedPlanarFreehandAnnotation,
+      storeContexts: [],
+      options: {},
+    },
+
+    getActiveEnabledElement: {
+      commandFn: actions.getActiveEnabledElement,
+      storeContexts: [],
+      options: {},
+    },
+
+    // getActiveViewportEnabledElement: {
+    //   commandFn: actions.getActiveViewportEnabledElement,
+    //   storeContexts: [],
+    //   options: {},
+    // },
+
+    // iterateToolGroups: {
+    //   commandFn: actions.iterateToolGroups,
+    //   storeContexts: [],
+    //   options: {},
+    // },
   };
 
   return {

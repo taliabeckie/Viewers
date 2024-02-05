@@ -1,46 +1,18 @@
 import OHIF from '@ohif/core';
 import * as cornerstone3D from '@cornerstonejs/core';
-import CineController from '../cine/CineController';
 import createExternalAlgorithm from '../external-algorithm';
 import { _getViewport } from '../utils/getViewport';
 import createReportAsync from '../utils/exportSR/createReportAsync';
 import { readSR } from '../utils/importSR';
 import { addMeasurements } from '../utils/adapters';
 import { importAnnotationsFromAIPrediction } from '../utils/aiBackendIO';
-import { PlanarFreehandROITool } from '@cornerstonejs/tools';
 import ConfigPoint from 'config-point';
 import { FIDUCIAL_TOOL_NAME } from '../tools/FiducialTool';
 import createReportDialogPrompt from '../modals/createReportDialogPrompt';
 import labelPhasesDialogPrompt from '../modals/labelPhasesDialogPrompt';
 
-const PLANAR_FREEHAND_ROI_TOOL_NAME = PlanarFreehandROITool.toolName;
-
 const { metaData, utilities } = cornerstone3D;
 const { log, DicomMetadataStore } = OHIF;
-
-function autoPlayCine(viewportIndex, options) {
-  const viewport = _getViewport(viewportIndex);
-
-  try {
-    if (viewport && !isNaN(options.direction)) {
-      viewport.scroll(options.direction, false, true);
-    }
-  } catch (error) {
-    console.log(`Error while playing cine:: ${error}`);
-  }
-}
-
-const getNumberOfFrames = viewportIndex => {
-  const viewport = _getViewport(viewportIndex);
-
-  if (!viewport) {
-    return 0;
-  }
-
-  return viewport.getImageIds().length;
-};
-
-const cineController = new CineController(getNumberOfFrames, autoPlayCine);
 
 const commandsModule = props => {
   const { actions: mlActions, definitions: mlDefinitions } = createExternalAlgorithm(props);
@@ -50,10 +22,6 @@ const commandsModule = props => {
   const { UIDialogService } = servicesManager.services || {};
 
   const actions = {
-    autoScroll: ({ direction, viewports, playOptions }) => {
-      cineController.update(direction, viewports, playOptions);
-    },
-
     openCreateReportDialog: () => {
       try {
         createReportDialogPrompt(UIDialogService).then((promptResult = {}) => {
@@ -164,12 +132,12 @@ const commandsModule = props => {
       }
 
       switch (toolName) {
-        case PLANAR_FREEHAND_ROI_TOOL_NAME:
-          const { joinedOpenContour } = codingValue;
+        // case PLANAR_FREEHAND_ROI_TOOL_NAME:
+        //   const { joinedOpenContour } = codingValue;
 
-          data.isOpenUShapeContour = !!joinedOpenContour;
+        //   data.isOpenUShapeContour = !!joinedOpenContour;
 
-          break;
+        //   break;
         case FIDUCIAL_TOOL_NAME:
           //seriesLabel
           const { seriesLabel } = codingValue;

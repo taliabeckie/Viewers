@@ -15,7 +15,6 @@ import { ContextMenuController, CustomizableContextMenuTypes } from './Customiza
 import * as dicomWebUtils from './DicomWebDataSource/utils';
 import { createReportDialogPrompt } from './Panels';
 import createReportAsync from './Actions/createReportAsync';
-
 const defaultExtension: Types.Extensions.Extension = {
   /**
    * Only required property. Should be a unique value across all extensions.

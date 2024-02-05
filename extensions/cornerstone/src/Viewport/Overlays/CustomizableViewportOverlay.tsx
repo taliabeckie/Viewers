@@ -9,6 +9,7 @@ import { ServicesManager } from '@ohif/core';
 import { ImageSliceData } from '@cornerstonejs/core/dist/esm/types';
 
 import './CustomizableViewportOverlay.css';
+import { MetadataProvider } from 'platform/core/src/classes';
 
 const EPSILON = 1e-4;
 
@@ -97,6 +98,25 @@ function InstanceNumberOverlayItem({
   );
 }
 
+function SliceLocationOverlayItem({
+  sliceLocation,
+  imageSliceData,
+  customization,
+}: OverlayItemProps) {
+  const { imageIndex, numberOfSlices } = imageSliceData;
+
+  return (
+    <div
+      className="overlay-item flex flex-row"
+      style={{ color: (customization && customization.color) || undefined }}
+    >
+      <span className="mr-1 shrink-0">SLoc:</span>
+      <span className="font-light">{sliceLocation}x</span>
+      <span className="font-light"></span>
+    </div>
+  );
+}
+
 /**
  * Customizable Viewport Overlay
  */
@@ -141,6 +161,10 @@ function CustomizableViewportOverlay({
     }
     return null;
   }, [viewportData, viewportId, imageIndex, cornerstoneViewportService]);
+
+  // get sliceLocation
+  //const sliceLocation = (instanceNumber.SliceNumber);
+  //let sliceLocation;
 
   /**
    * Initial toolbar state
@@ -252,6 +276,7 @@ function CustomizableViewportOverlay({
         voi,
         scale,
         instanceNumber,
+        // sliceLocation,
       };
 
       if (item.customizationType === 'ohif.overlayItem.windowLevel') {
@@ -260,6 +285,8 @@ function CustomizableViewportOverlay({
         return <ZoomOverlayItem {...overlayItemProps} />;
       } else if (item.customizationType === 'ohif.overlayItem.instanceNumber') {
         return <InstanceNumberOverlayItem {...overlayItemProps} />;
+        // } else if (item.customizationType === 'ohif.overlayItem.sliceLocation') {
+        //   return <SliceLocationOverlayItem {...overlayItemProps} />;
       } else {
         const renderItem = customizationService.transform(item);
 
@@ -315,7 +342,12 @@ function CustomizableViewportOverlay({
   }, [topRightCustomization, _renderOverlayItem]);
 
   const getBottomLeftContent = useCallback(() => {
-    const items = bottomLeftCustomization?.items || [];
+    const items = topRightCustomization?.items || [
+      {
+        id: 'SLoc',
+        customizationType: 'ohif.overlayItem.sliceLocation',
+      },
+    ];
     return (
       <>
         {items.map((item, i) => (

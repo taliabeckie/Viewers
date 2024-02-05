@@ -51,6 +51,124 @@ const findingsContextMenu = {
     },
 
     {
+      id: 'seriesLabellingSelectionMenu',
+      selector: ({ nearbyToolData }) => !nearbyToolData,
+      items: [
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SegmentationCardiac:4ch',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SegmentationCardiac:3ch',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:399232001',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:103340004',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SegmentationCardiac:av',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:91134007',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:122972007',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SegmentationCardiac:ao_cc',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:24422004',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:81654009',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SCT:30730003',
+        },
+        {
+          actionType: 'SetSeriesLabel',
+          findingSite: 'SegmentationCardiac:other',
+        },
+      ],
+    },
+
+    {
+      id: 'fiducialSiteSelectionMenu',
+      selector: ({ nearbyToolData }, menuId) => menuId === 'fiducialSiteSelectionMenu',
+      items: [
+        {
+          label: 'Delete measurement',
+          actionType: 'Delete',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000101',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000102',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000201',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000202',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000203',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000204',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000301',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000401',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000501',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000601',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000602',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000603',
+        },
+        {
+          actionType: 'SiteSelection',
+          findingSite: 'SegmentationCardiac:20000701',
+        },
+      ],
+    },
+
+    {
       id: 'orientationSelectionSubMenu',
       selector: ({ nearbyToolData }) => false,
       items: [

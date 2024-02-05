@@ -45,6 +45,8 @@ import { setAnnotationVisibility } from './utils/measurementServiceMappings/util
 import registerCustomCornerstoneTools from './registerCustomCornerstoneTools.js';
 import CornerstoneCache from './services/ViewportService/CornerstoneCacheService';
 import configureTools from '../../../ucalgary-extension/src/configureTools';
+import ExternalAlgorithmService from '../../../ucalgary-extension/src/services/ExternalAlgorithmService';
+//'./services/ExternalAlgorithmService';
 
 const Component = React.lazy(() => {
   return import(/* webpackPrefetch: true */ './Viewport/OHIFCornerstoneViewport');
@@ -97,6 +99,7 @@ const cornerstoneExtension: Types.Extensions.Extension = {
     servicesManager.registerService(SyncGroupService.REGISTRATION);
     servicesManager.registerService(SegmentationService.REGISTRATION);
     servicesManager.registerService(CornerstoneCacheService.REGISTRATION);
+    servicesManager.registerService(ExternalAlgorithmService);
     configureTools();
     return init.call(this, props);
   },

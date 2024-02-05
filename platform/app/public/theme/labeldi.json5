@@ -31,22 +31,6 @@
         text: 'Aortic insufficiency',
         color: 'darkred',
       },
-      // Series labels
-      //   'SegmentationCardiac:es-lax': {
-      //    text: 'End-Systole-LAX',
-      //     color: '#000000',
-      //     seriesLabel: true,
-      //   },
-      //   'SegmentationCardiac:es-sax': {
-      //     text: 'End-Systole-SAX',
-      //      color: '#000000',
-      //     seriesLabel: true,
-      //    },
-      //   'SegmentationCardiac:ed': {
-      //     text: 'End-Diastole',
-      //    color: '#000000',
-      //     seriesLabel: true,
-      //   },
       'SegmentationCardiac:4ch': {
         text: '4-chamber',
         color: '#000000',

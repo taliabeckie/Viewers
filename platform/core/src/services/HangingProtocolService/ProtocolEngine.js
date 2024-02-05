@@ -42,7 +42,7 @@ export default class ProtocolEngine {
     // Retrieve the highest scoring Protocol
     const bestMatch = this._getHighestScoringProtocol();
 
-    console.log('ProtocolEngine::getBestProtocolMatch bestMatch', bestMatch);
+    //console.log('ProtocolEngine::getBestProtocolMatch bestMatch', bestMatch);
 
     return bestMatch;
   }
@@ -51,7 +51,7 @@ export default class ProtocolEngine {
    * Populates the MatchedProtocols Collection by running the matching procedure
    */
   updateProtocolMatches() {
-    console.log('ProtocolEngine::updateProtocolMatches');
+    //console.log('ProtocolEngine::updateProtocolMatches');
 
     // Clear all data currently in matchedProtocols
     this._clearMatchedProtocols();
@@ -150,7 +150,7 @@ export default class ProtocolEngine {
     // Sort the matched list by score
     sortByScore(matched);
 
-    console.log('ProtocolEngine::findMatchByStudy matched', matched);
+    //console.log('ProtocolEngine::findMatchByStudy matched', matched);
 
     return matched;
   }

@@ -1,6 +1,8 @@
 import { toolNames } from './initCornerstoneTools';
 import { registerCustomToolsMappingFactory } from './utils/measurementServiceMappings/customToolsMappingFactory';
 import * as csTools from '@cornerstonejs/tools';
+import FiducialTool from 'ucalgary-extension/src/tools/FiducialTool';
+import Fiducial from './utils/measurementServiceMappings/Fiducial';
 
 const { BaseTool } = csTools;
 

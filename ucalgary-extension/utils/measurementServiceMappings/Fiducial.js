@@ -133,9 +133,6 @@ const Fiducial = {
     // For findings with a a series label, always set them invisible.
     //const { codingValues = {} } = ConfigPoint.getConfig('contextMenus');
     const codingValue = codingValues[measurement?.findingSite?.ref];
-    console.log('coding values:');
-    console.log(codingValues);
-    console.log(codingValue);
 
     if (codingValue?.seriesLabel === true) {
       visibility = false;

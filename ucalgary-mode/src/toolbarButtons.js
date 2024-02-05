@@ -463,42 +463,6 @@ const toolbarButtons = [
       type: 'ActionButton',
       props: {
         items: [
-          // {
-          //   id: 'runExternalAlgorithm',
-          //   icon: 'pencil',
-          //   tooltip: 'External Algorithm',
-          //   label: 'Run Algorithm',
-          //   commands: [
-          //     {
-          //       commandName: 'runExternalAlgorithm',
-          //       commandOptions: {
-          //         items: [
-          //           {
-          //             id: 'GenerateContours',
-          //             commandName: 'initiateExternalAlgorithm',
-          //             commandOptions: {
-          //               name: 'Generate Contours',
-          //               endpointName: 'GenerateContours',
-          //               algorithm: { algorithmName: 'GenerateContours', version: '0.0.1' },
-          //             },
-          //             context: 'CORNERSTONE',
-          //           },
-          //           {
-          //             id: 'APIPrediction',
-          //             commandName: 'initiateExternalAlgorithm',
-          //             commandOptions: {
-          //               name: 'AI Prediction',
-          //               endpointName: 'APIPrediction',
-          //               algorithm: { algorithmName: 'DiseasePrediction', version: '0.0.1' },
-          //             },
-          //             context: 'CORNERSTONE',
-          //           },
-          //         ],
-          //       },
-          //       context: 'CORNERSTONE',
-          //     },
-          //   ],
-          // },
           {
             id: 'openCreateReportDialog',
             icon: 'pencil',
